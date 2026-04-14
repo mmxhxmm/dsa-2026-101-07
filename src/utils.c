@@ -1,10 +1,9 @@
-#include <stdio.h>
-#include <string.h>
+#include "../lib/common.h"
 
 /*
     @param:     maximum size of the string to read
     @def:       reads from stdin a string with the correct length
-    @return:    a pointer of char
+    @return:    char pointer to fisrt character of string 
 */
 char    *input_str(int max)
 {
@@ -33,4 +32,18 @@ char    *input_str(int max)
     
     free(str);
     return NULL;
+}
+
+int input_int()
+{
+	char	*temp = input_str(10);
+	int		value;
+
+	if (temp == NULL)
+		return -1;
+    
+    value = atoi(temp);
+    free(temp);
+
+    return value;
 }
