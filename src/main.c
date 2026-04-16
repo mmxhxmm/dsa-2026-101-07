@@ -1,6 +1,7 @@
 #include "../lib/common.h"
 #include "../lib/utils.h"
 #include "../lib/houses.h"
+#include "../lib/menu.h"
 
 void createaleak()
 {
@@ -10,11 +11,11 @@ void createaleak()
 
 int main()
 {
-	t_houses houses;
+    t_houses *houses = NULL;
+    
 	menu(&houses);
 
-  // uncomment and run "make v" to see how valgrind detects memory leaks
-  // createaleak();
+	// createaleak();
 
-  return 0;
+	return 0;
 }

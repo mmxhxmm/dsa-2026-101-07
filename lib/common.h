@@ -9,7 +9,7 @@
 
 typedef struct s_house
 {
-  char    *st_name;
+  char    st_name[100];
   int     num;
   double  lat;
   double  lon;
@@ -18,8 +18,7 @@ typedef struct s_house
 typedef struct	s_houses
 {
 	t_house	house;
-	int		num;
-	struct  Houses* next;
+	struct  s_houses *next;
 }			t_houses;
 
 #endif
