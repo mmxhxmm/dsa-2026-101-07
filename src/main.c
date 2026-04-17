@@ -1,20 +1,31 @@
+<<<<<<< HEAD
 /*#include "sample_lib.h"
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+=======
+#include "../lib/common.h"
+#include "../lib/utils.h"
+#include "../lib/houses.h"
+#include "../lib/menu.h"
+>>>>>>> origin/main
 
-void createaleak() {
+void createaleak()
+{
   char *foo = malloc(20 * sizeof(char));
   printf("Allocated leaking string: %s", foo);
 }
 
-int main() {
-  printf("*****************\nWelcome to DSA!\n*****************\n");
+int main()
+{
+    t_houses *houses = NULL;
+    
+	menu(&houses);
 
-  // how to import and call a function
-  printf("Factorial of 4 is %d\n", fact(4));
+	// createaleak();
 
+<<<<<<< HEAD
   // uncomment and run "make v" to see how valgrind detects memory leaks
   // createaleak();
 
@@ -196,3 +207,7 @@ int main(void) {
     house_list_free(houses);
     return 0;
 }
+=======
+	return 0;
+}
+>>>>>>> origin/main
