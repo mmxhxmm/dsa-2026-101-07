@@ -2,16 +2,9 @@
 #include "../lib/utils.h"
 #include "../lib/houses.h"
 
-void    free_list(t_houses *list)
+void	origin_info(t_house o)
 {
-    t_houses    *temp;
-    
-    while (list)
-    {
-        temp = list;
-        list = list->next;
-        free(temp);
-    }
+	printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);
 }
 
 t_houses*   init_map(const char *map_name)
@@ -80,20 +73,7 @@ t_house handle_address_search(t_houses *list)
 
 t_house menu(t_houses **list)
 {
-    printf("Enter map name (ex: xs_1, xl_1, ...): ");
-    char    *map_name = input_str(20);
     t_house house = {0};
-
-    *list = init_map(map_name);
-
-    if (!*list)
-    {
-        printf("Error loading map\n");
-        free(map_name);
-        return (house);
-    }
-
-    free(map_name);
 
     printf("\nMap loaded. Where are you? Address (1), Place (2), Coordinate (3): ");
     int option = input_int();
@@ -102,6 +82,7 @@ t_house menu(t_houses **list)
     {
         case 1:
             house = handle_address_search(*list);
+    		printf("\n\tFound at (%.2f, %.2f)\n", house.lat, house.lon);
             break;
         case 2:
             printf("Not handled yet!\n");
@@ -109,9 +90,18 @@ t_house menu(t_houses **list)
             break;
         case 3:
             printf("Not handled yet!\n");
-            // handle_coord_search(list);
+            // handle_place_search(list);
             break;
     }
-    printf("\n\tFound at (%.2f, %.2f)\n", house.lat, house.lon);
     return (house);
+}
+
+int action_menu()
+{
+	printf("\t1.\tORIGIN\n");
+	printf("\t2.\tDESTINATION\t(only if you have your origin)\n");
+	printf("\t3.\tORIGIN INFO\n");
+	printf("\t4.\tEXIT\n\n");
+	printf("Enter an option: ");
+	return (input_int());
 }

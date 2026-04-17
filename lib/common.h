@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <stdbool.h>
 #include <sys/stat.h>
 
 typedef struct s_house
