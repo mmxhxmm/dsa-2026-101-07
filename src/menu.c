@@ -112,5 +112,6 @@ t_house menu(t_houses **list)
             // handle_coord_search(list);
             break;
     }
+    printf("\n\tFound at (%.2f, %.2f)\n", house.lat, house.lon);
     return (house);
 }

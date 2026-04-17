@@ -9,13 +9,16 @@ void createaleak()
   printf("Allocated leaking string: %s", foo);
 }
 
+//void  ft_free()
+
 int main()
 {
-    t_houses *houses = NULL;
+  t_houses *houses = NULL;
     
-	menu(&houses);
+	t_house origin = menu(&houses);
+  (void) origin;
 
-	// createaleak();
+	createaleak();
 
 	return 0;
 }

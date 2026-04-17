@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 int	compare_streets(const char *search, const char *list_name)
 {
     if (strcasecmp(search, list_name) == 0)

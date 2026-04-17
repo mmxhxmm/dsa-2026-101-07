@@ -3,8 +3,8 @@
 
 #include "../lib/common.h"
 
-void    menu(t_houses **list);
-void    handle_address_search(t_houses *list);
+t_house menu(t_houses **list);
+t_house handle_address_search(t_houses *list);
 
 t_houses*   init_map(const char *map_name);
 
