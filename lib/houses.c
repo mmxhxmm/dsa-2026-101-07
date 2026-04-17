@@ -218,7 +218,18 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number)
         names[j + 1] = key;
     }
 
-    int show = count < 5 ? count : 5;
+    // only show streets with distance <= 10, max 5
+    int show = 0;
+    for (int i = 0; i < count && show < 5; i++)
+        if (lev_distance(name, names[i]) <= 10)
+            show++;
+
+    if (show == 0)
+    {
+        printf("Street \"%s\" not found and no similar streets found.\n", name);
+        free(names);
+        return NULL;
+    }
 
     printf("Street \"%s\" not found. Did you mean:\n", name);
     for (int i = 0; i < show; i++)
