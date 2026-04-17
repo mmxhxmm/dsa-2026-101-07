@@ -185,18 +185,16 @@ t_house	*suggest_similar_streets(t_houses *list, const char *name, int number)
     printf("Street \"%s\" not found. Did you mean:\n", name);
     for (int i = 0; i < count; i++)
         printf("  %d. %s\n", i + 1, similar[i]);
-    printf("  0. Cancel\n");
-    // flush leftover newline from previous input_int() call
-    while (getchar() != '\n' && !feof(stdin));
-    printf("Choose (enter number 1-%d): ", count); 
-    // Read as string first, then parse — avoids scanf buffer corruption
-    char buf[16];
-    if (!fgets(buf, sizeof(buf), stdin))
-    {
-        free(similar);
-        return NULL;
-    }
-    int choice = atoi(buf);
+  printf("  0. Cancel\n");
+  printf("Choose (enter number 1-%d): ", count);
+  char *buf = input_str(10);
+  if (!buf)
+  {
+      free(similar);
+      return NULL;
+  }
+  int choice = atoi(buf);
+  free(buf);
 
     if (choice <= 0 || choice > count)
     {
