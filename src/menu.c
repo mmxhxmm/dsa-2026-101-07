@@ -57,9 +57,18 @@ t_house handle_address_search(t_houses *list)
         }
         curr = curr->next;
     }
-
+/*
     if (!street_exists)
-        printf("Street not found.\n");
+        printf("Street not found.\n");*/
+    if (!street_exists)
+        {
+            t_house *found = suggest_similar_streets(list, name, num);
+            if (found)
+            {
+                free(name);
+                return *found;
+            }
+        }
     else
     {
         printf("Invalid number. Valid numbers: ");
