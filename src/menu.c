@@ -28,61 +28,56 @@ t_houses*   init_map(const char *map_name)
 
 t_house handle_address_search(t_houses *list)
 {
-    printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
-    char *name = input_str(100);
     t_house empty = {0};
 
+    printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
+    char *name = input_str(100);
     if (!name)
         return empty;
 
-    int num;
-    int street_exists = 0;
-
-    t_houses *curr = list;
-
     printf("Enter street number: ");
-    num = input_int();
+    int num = input_int();
 
-    while (curr)
+    // exact match first
+    t_house *result = search_house_addr(list, name, num);
+    if (result)
     {
-        if (compare_streets(name, curr->house.st_name))
-        {
-            street_exists = 1;
+        printf("Coordinates: %.6f, %.6f\n", result->lat, result->lon);
+        free(name);
+        return *result;
+    }
 
-            if (curr->house.num == num)
+    // street exists but wrong number
+    if (street_exists_in_list(list, name))
+    {
+        printf("Invalid number for \"%s\".\n", name);
+        print_valid_numbers(list, name);
+        printf("Enter a valid number: ");
+        char *nbuf = input_str(10);
+        if (nbuf)
+        {
+            int new_num = atoi(nbuf);
+            free(nbuf);
+            result = search_house_addr(list, name, new_num);
+            if (result)
             {
+                printf("Coordinates: %.6f, %.6f\n", result->lat, result->lon);
                 free(name);
-                return curr->house; 
+                return *result;
             }
         }
-        curr = curr->next;
-    }
-/*
-    if (!street_exists)
-        printf("Street not found.\n");*/
-    if (!street_exists)
-    {
-        t_house *found = suggest_similar_streets(list, name, num);
         free(name);
-        if (found)
-            return *found;
-        return empty;  // found is NULL, number didn't exist on chosen street
-    }
-    else
-    {
-        printf("Invalid number. Valid numbers: ");
-
-        curr = list;
-        while (curr)
-        {
-            if (compare_streets(name, curr->house.st_name))
-                printf("%d ", curr->house.num);
-            curr = curr->next;
-        }
-        printf("\n");
+        return empty;
     }
 
+    // street not found — suggest similar
+    result = suggest_similar_streets(list, name, num);
     free(name);
+    if (result)
+    {
+        printf("Coordinates: %.6f, %.6f\n", result->lat, result->lon);
+        return *result;
+    }
     return empty;
 }
 
