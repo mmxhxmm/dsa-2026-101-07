@@ -85,7 +85,7 @@ t_house *search_house_addr(t_houses *list, const char *name, int number)
 }
 
 // returns 1 if street exists in list (ignoring number)
-static int street_exists_in_list(t_houses *list, const char *name)
+int street_exists_in_list(t_houses *list, const char *name)
 {
     while (list)
     {
@@ -120,7 +120,7 @@ static int lev_distance(const char *a, const char *b)
 }
 
 // prints valid numbers for a known street
-static void print_valid_numbers(t_houses *list, const char *name)
+void print_valid_numbers(t_houses *list, const char *name)
 {
     printf("Valid numbers for that street: ");
     while (list)
