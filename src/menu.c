@@ -1,7 +1,10 @@
 #include "../lib/common.h"
 #include "../lib/utils.h"
 #include "../lib/houses.h"
-
+/*
+** Frees all nodes in a houses linked list.
+** Traverses the list and frees each node one by one.
+*/
 void    free_list(t_houses *list)
 {
     t_houses    *temp;
@@ -13,7 +16,11 @@ void    free_list(t_houses *list)
         free(temp);
     }
 }
-
+/*
+** Builds the file path to the houses.txt file for the given map name,
+** then loads and returns the houses linked list from that file.
+** Returns NULL if map_name is NULL or the file can't be loaded.
+*/
 t_houses*   init_map(const char *map_name)
 {
     char    file_path[100];
@@ -25,7 +32,16 @@ t_houses*   init_map(const char *map_name)
     
     return load_houses_from_file(file_path);
 }
-
+/*
+** Handles the full address search flow:
+**   1. Asks the user for a street name and house number
+**   2. If exact match found → prints coordinates and returns the house
+**   3. If street exists but number is wrong → shows valid numbers, asks again
+**   4. If street is not found at all → calls suggest_similar_streets()
+**      which ranks similar street names by Levenshtein distance and lets
+**      the user pick one, then also handles wrong number on chosen street
+** Returns the matched t_house, or an empty t_house if nothing is found.
+*/
 t_house handle_address_search(t_houses *list)
 {
     t_house empty = {0};
@@ -80,7 +96,14 @@ t_house handle_address_search(t_houses *list)
     }
     return empty;
 }
-
+/*
+** Main menu function. Asks the user for a map name and loads it,
+** then asks how they want to search for their position:
+**   1 → address search (street name + number)
+**   2 → place search (not implemented yet)
+**   3 → coordinate search (not implemented yet)
+** Returns the found t_house, or an empty one if nothing matched.
+*/
 t_house menu(t_houses **list)
 {
     printf("Enter map name (ex: xs_1, xl_1, ...): ");
