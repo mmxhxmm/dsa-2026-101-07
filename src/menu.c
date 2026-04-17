@@ -1,13 +1,18 @@
-#include "../lib/common.h"
-#include "../lib/utils.h"
-#include "../lib/houses.h"
+#include "../hdr/common.h"
+#include "../hdr/utils.h"
+#include "../hdr/houses.h"
 
 void	origin_info(t_house o)
 {
 	printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);
 }
 
-t_houses*   init_map(const char *map_name)
+/*
+** Builds the file path to the houses.txt file for the given map name,
+** then loads and returns the houses linked list from that file.
+** Returns NULL if map_name is NULL or the file can't be loaded.
+*/
+t_houses*   init_list_houses(const char *map_name)
 {
     char    file_path[100];
     
@@ -19,70 +24,92 @@ t_houses*   init_map(const char *map_name)
     return load_houses_from_file(file_path);
 }
 
-t_house handle_address_search(t_houses *list)
+/*
+** Handles the full address search flow:
+**   1. Asks the user for a street name and house number
+**   2. If exact match found → prints coordinates and returns the house
+**   3. If street exists but number is wrong → shows valid numbers, asks again
+**   4. If street is not found at all → calls suggest_similar_streets()
+**      which ranks similar street names by Levenshtein distance and lets
+**      the user pick one, then also handles wrong number on chosen street
+** Returns the matched t_house, or an empty t_house if nothing is found.
+*/
+int	handle_address_search(double *coordinates, t_houses *list)
 {
     printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
     char *name = input_str(100);
-    t_house empty = {0};
-
     if (!name)
-        return empty;
-
-    int num;
-    int street_exists = 0;
-
-    t_houses *curr = list;
+        return EXIT_FAILURE;
 
     printf("Enter street number: ");
-    num = input_int();
+    int num = input_int();
 
-    while (curr)
+    // exact match first
+    t_house *result = search_house_addr(list, name, num);
+    if (result)
     {
-        if (compare_streets(name, curr->house.st_name))
-        {
-            street_exists = 1;
+		coordinates[0] = result->lat;
+		coordinates[1] = result->lon;
+        free(name);
+		return EXIT_SUCCESS;
+    }
 
-            if (curr->house.num == num)
+    // street exists but wrong number
+    if (street_exists_in_list(list, name))
+    {
+        printf("Invalid number for \"%s\".\n", name);
+        print_valid_numbers(list, name);
+        printf("Enter a valid number: ");
+        char *nbuf = input_str(10);
+
+        if (nbuf)
+        {
+            int new_num = atoi(nbuf);
+            free(nbuf);
+            result = search_house_addr(list, name, new_num);
+            
+			if (result)
             {
+				coordinates[0] = result->lat;
+				coordinates[1] = result->lon;
                 free(name);
-                return curr->house; 
+				return EXIT_SUCCESS;
             }
         }
-        curr = curr->next;
+        free(name);
+		return EXIT_FAILURE;
     }
 
-    if (!street_exists)
-        printf("Street not found.\n");
-    else
-    {
-        printf("Invalid number. Valid numbers: ");
-
-        curr = list;
-        while (curr)
-        {
-            if (compare_streets(name, curr->house.st_name))
-                printf("%d ", curr->house.num);
-            curr = curr->next;
-        }
-        printf("\n");
-    }
-
+    // street not found — suggest similar
+    result = suggest_similar_streets(list, name, num);
     free(name);
-    return empty;
+    if (result)
+    {
+		coordinates[0] = result->lat;
+		coordinates[1] = result->lon;
+		return EXIT_SUCCESS;
+    }
+	return EXIT_FAILURE;
 }
 
-t_house menu(t_houses **list)
+/*
+** Main menu function. Asks the user for a map name and loads it,
+** then asks how they want to search for their position:
+**   1 → address search (street name + number)
+**   2 → place search (not implemented yet)
+**   3 → coordinate search (not implemented yet)
+** Returns the found t_house, or an empty one if nothing matched.
+*/
+int	menu(double *coordinates, t_houses **list)
 {
-    t_house house = {0};
-
     printf("\nMap loaded. Where are you? Address (1), Place (2), Coordinate (3): ");
     int option = input_int();
 
     switch(option)
     {
         case 1:
-            house = handle_address_search(*list);
-    		printf("\n\tFound at (%.2f, %.2f)\n", house.lat, house.lon);
+            if (handle_address_search(coordinates, *list))
+				return EXIT_FAILURE;
             break;
         case 2:
             printf("Not handled yet!\n");
@@ -93,15 +120,14 @@ t_house menu(t_houses **list)
             // handle_place_search(list);
             break;
     }
-    return (house);
+	return EXIT_SUCCESS;
 }
 
 int action_menu()
 {
 	printf("\t1.\tORIGIN\n");
 	printf("\t2.\tDESTINATION\t(only if you have your origin)\n");
-	printf("\t3.\tORIGIN INFO\n");
-	printf("\t4.\tEXIT\n\n");
+	printf("\t3.\tEXIT\n\n");
 	printf("Enter an option: ");
 	return (input_int());
 }

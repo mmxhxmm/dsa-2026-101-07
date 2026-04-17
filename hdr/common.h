@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 typedef struct s_house
 {

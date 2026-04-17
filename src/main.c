@@ -1,7 +1,7 @@
-#include "../lib/common.h"
-#include "../lib/utils.h"
-#include "../lib/houses.h"
-#include "../lib/menu.h"
+#include "../hdr/common.h"
+#include "../hdr/utils.h"
+#include "../hdr/houses.h"
+#include "../hdr/menu.h"
 
 void	createaleak()
 {
@@ -9,6 +9,10 @@ void	createaleak()
 	printf("Allocated leaking string: %s", foo);
 }
 
+/*
+** Frees all nodes in a houses linked list.
+** Traverses the list and frees each node one by one.
+*/
 void    free_houses(t_houses *list)
 {
     t_houses    *temp;
@@ -40,22 +44,32 @@ void	print_houses(t_houses *node)
 	}	
 }
 
+int	init(char *map_name, t_houses **houses) // add t_places
+{
+	*houses = init_list_houses(map_name);
+	
+	if (!*houses)
+		return EXIT_FAILURE;
+	return EXIT_SUCCESS;
+}
+
 int main()
 {
-    bool exit = false;
-    int option;
-    t_houses 	*houses = NULL;
-	t_house		origin = {0};
+    bool		exit = false;
+    int			option;
+    t_houses	*houses = NULL;
+	double		coordinates[2];
 
 
 	printf("\n\t--------- WELCOME to NPM-MAPS ------------\n");
     printf("Enter map name (ex: xs_1, xl_1, ...): ");
     char    *map_name = input_str(20);
-		
-	houses = init_map(map_name);
-    if (!houses)
+	if (!map_name)
+		return EXIT_FAILURE;
+
+	if (init(map_name, &houses))
     {
-        printf("Error loading map\n");
+        printf("AQUI Error loading map\n");
         free(map_name);
 		return EXIT_FAILURE;
     }
@@ -69,29 +83,21 @@ int main()
         {
             case 1: 
             {
-                origin = menu(&houses);
-				if (origin.num != 0)
-					printf("\tFound at (%f, %f)\n", origin.lon, origin.lat);
-				else
+				if (menu(coordinates, &houses))
 					printf("Location not found\n");
+				else
+					printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
                 break;
             }
 
             case 2:
-				if (origin.num != 0)
+				if (coordinates[0] != 0)
             		printf("Not implemented yet!\n");
 				else
             		printf("Please enter origin\n");
                 break;
 
-            case 3:
-				if (origin.num != 0) 
-					origin_info(origin);
-				else
-					printf("No origin location\n");
-                break;
-
-            case 4: 
+            case 3: 
                 exit = true;
                 break;
 
