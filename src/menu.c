@@ -26,38 +26,45 @@ t_houses*   init_map(const char *map_name)
     return load_houses_from_file(file_path);
 }
 
-void    handle_address_search(t_houses *list)
+t_house handle_address_search(t_houses *list)
 {
-    char    *name = input_str(50);
-    int     num = input_int();
-    int     street_exists = 0;
-    
-    t_houses    *curr = list;
-    t_houses    *found = NULL;
+    printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
+    char *name = input_str(100);
+    t_house empty = {0};
 
-    // Busqueda secuencial
+    if (!name)
+        return empty;
+
+    int num;
+    int street_exists = 0;
+
+    t_houses *curr = list;
+
+    printf("Enter street number: ");
+    num = input_int();
+
     while (curr)
     {
         if (compare_streets(name, curr->house.st_name))
         {
             street_exists = 1;
+
             if (curr->house.num == num)
             {
-                found = curr;
-                break;
+                free(name);
+                return curr->house; 
             }
         }
         curr = curr->next;
     }
 
-    if (found)
+    if (!street_exists)
+        printf("Street not found.\n");
+    else
     {
-        printf("    Found at (%f, %f)\n", found->house.lat, found->house.lon);
-    } else if (street_exists)
-    {
-        printf("Invalid number. Valid numbers in this street: ");
-        curr = list;
+        printf("Invalid number. Valid numbers: ");
 
+        curr = list;
         while (curr)
         {
             if (compare_streets(name, curr->house.st_name))
@@ -65,17 +72,17 @@ void    handle_address_search(t_houses *list)
             curr = curr->next;
         }
         printf("\n");
-    } else {
-        printf("Street not found.\n");
     }
+
     free(name);
+    return empty;
 }
 
-
-void menu(t_houses **list)
+t_house menu(t_houses **list)
 {
     printf("Enter map name (ex: xs_1, xl_1, ...): ");
-    char *map_name = input_str(20);
+    char    *map_name = input_str(20);
+    t_house house = {0};
 
     *list = init_map(map_name);
 
@@ -83,7 +90,7 @@ void menu(t_houses **list)
     {
         printf("Error loading map\n");
         free(map_name);
-        return;
+        return (house);
     }
 
     free(map_name);
@@ -94,7 +101,7 @@ void menu(t_houses **list)
     switch(option)
     {
         case 1:
-            handle_address_search(*list);
+            house = handle_address_search(*list);
             break;
         case 2:
             printf("Not handled yet!\n");
@@ -105,4 +112,5 @@ void menu(t_houses **list)
             // handle_coord_search(list);
             break;
     }
+    return (house);
 }
