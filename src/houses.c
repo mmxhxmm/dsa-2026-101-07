@@ -1,5 +1,5 @@
 #include "../lib/common.h"
-
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -188,10 +188,20 @@ t_house	*suggest_similar_streets(t_houses *list, const char *name, int number)
     for (int i = 0; i < count; i++)
         printf("  %d. %s\n", i + 1, similar[i]);
     printf("  0. Cancel\n");
-    printf("Choose: ");
+    // flush leftover newline from previous input_int() call
+    while (getchar() != '\n' && !feof(stdin));
+    printf("Choose (enter number): ");
 
-    int choice;
-    if (scanf("%d", &choice) != 1 || choice <= 0 || choice > count)
+    // Read as string first, then parse — avoids scanf buffer corruption
+    char buf[16];
+    if (!fgets(buf, sizeof(buf), stdin))
+    {
+        free(similar);
+        return NULL;
+    }
+    int choice = atoi(buf);
+
+    if (choice <= 0 || choice > count)
     {
         free(similar);
         return NULL;
