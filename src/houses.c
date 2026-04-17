@@ -1,4 +1,5 @@
 #include "../lib/common.h"
+#include "../lib/utils.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
