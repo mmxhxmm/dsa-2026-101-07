@@ -120,18 +120,16 @@ t_houses *load_houses_from_file(const char *file_name)
     fclose(file);
     return list;
 }
-
 t_house	*search_house_addr(t_houses *list, const char *name, int number)
 {
-    t_houses    *current = list;
-
+    t_houses *current = list;
     while (current != NULL)
     {
-        if (number == current->house.num && compare_streets(current->house.st_name, name))
+        if (number == current->house.num && compare_streets(name, current->house.st_name))
             return (&current->house);
         current = current->next;
     }
-    return (NULL); 
+    return NULL;
 }
 
 static char	**get_similar_streets(t_houses *list, const char *name, int max, int *out_count)
@@ -190,8 +188,7 @@ t_house	*suggest_similar_streets(t_houses *list, const char *name, int number)
     printf("  0. Cancel\n");
     // flush leftover newline from previous input_int() call
     while (getchar() != '\n' && !feof(stdin));
-    printf("Choose (enter number): ");
-
+    printf("Choose (enter number 1-%d): ", count); 
     // Read as string first, then parse — avoids scanf buffer corruption
     char buf[16];
     if (!fgets(buf, sizeof(buf), stdin))
