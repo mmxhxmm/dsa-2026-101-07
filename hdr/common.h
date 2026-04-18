@@ -23,4 +23,20 @@ typedef struct	s_houses
 	struct  s_houses *next;
 }			t_houses;
 
+
+typedef struct  s_place
+{
+  char    st_name[100];
+  double  lat;
+  double  lon;
+}t_place;
+
+typedef struct s_places
+{
+  t_place place;
+  struct  s_places *next;
+
+}t_places;
+
 #endif
+

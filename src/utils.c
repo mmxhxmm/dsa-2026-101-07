@@ -14,7 +14,7 @@ char    *input_str(int max)
 
     if (fgets(str, max + 1, stdin))
     {
-        char *p = strchr(str, '\n');
+        char *p = strchr(str, '\n'); //Find the 1rst occurrence of \n to see if the string fits in the buffer
         
         if (p != NULL) {
             *p = '\0';

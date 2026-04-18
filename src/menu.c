@@ -1,6 +1,7 @@
 #include "../hdr/common.h"
 #include "../hdr/utils.h"
 #include "../hdr/houses.h"
+#include "../hdr/places.h"
 
 void	origin_info(t_house o)
 {
@@ -24,6 +25,19 @@ t_houses*   init_list_houses(const char *map_name)
     return load_houses_from_file(file_path);
 }
 
+t_places*   init_list_places(const char *map_name)
+{
+    char    file_path[100];
+
+    if(!map_name)
+        return NULL;
+    printf("./maps/%s/places.txt\n", map_name);
+    snprintf(file_path, sizeof(file_path), "./maps/%s/places.txt", map_name);
+
+    return load_places_from_file(file_path);
+
+}
+
 /*
 ** Handles the full address search flow:
 **   1. Asks the user for a street name and house number
@@ -36,13 +50,13 @@ t_houses*   init_list_houses(const char *map_name)
 */
 int	handle_address_search(double *coordinates, t_houses *list)
 {
-    printf("Enter street name (e.g. \"Carrer de Roc Boronat\"): ");
-    char *name = input_str(100);
-    if (!name)
-        return EXIT_FAILURE;
-
     printf("Enter street number: ");
     int num = input_int();
+
+
+    printf("\nEnter street name (e.g. Carrer de Roc Boronat): ");
+
+    char *name = input_str(50);
 
     // exact match first
     t_house *result = search_house_addr(list, name, num);
@@ -92,6 +106,29 @@ int	handle_address_search(double *coordinates, t_houses *list)
 	return EXIT_FAILURE;
 }
 
+int handle_place_search(double *coordinates, t_places *list)
+{
+
+    printf("\nEnter place name (e.g. L'Illa Diagonal): ");
+
+    char *name_place = input_str(50);
+
+    t_place *result=search_place(list, name_place);
+
+    //Exact search
+    if (result)
+    {
+        coordinates[0]=result->lat;
+        coordinates[1]=result->lon;
+        free(name_place);
+        return EXIT_SUCCESS;
+    }
+
+
+    return EXIT_FAILURE;
+
+}
+
 /*
 ** Main menu function. Asks the user for a map name and loads it,
 ** then asks how they want to search for their position:
@@ -100,7 +137,7 @@ int	handle_address_search(double *coordinates, t_houses *list)
 **   3 → coordinate search (not implemented yet)
 ** Returns the found t_house, or an empty one if nothing matched.
 */
-int	menu(double *coordinates, t_houses **list)
+int	menu(double *coordinates, t_houses **list_houses, t_places **list_places)
 {
     printf("\nMap loaded. Where are you? Address (1), Place (2), Coordinate (3): ");
     int option = input_int();
@@ -108,12 +145,13 @@ int	menu(double *coordinates, t_houses **list)
     switch(option)
     {
         case 1:
-            if (handle_address_search(coordinates, *list))
+            if (handle_address_search(coordinates, *list_houses))
 				return EXIT_FAILURE;
             break;
         case 2:
-            printf("Not handled yet!\n");
-            // handle_place_search(list);
+            if (handle_place_search(coordinates, *list_places))
+                return EXIT_FAILURE;
+            
             break;
         case 3:
             printf("Not handled yet!\n");

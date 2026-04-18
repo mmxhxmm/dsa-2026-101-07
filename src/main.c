@@ -1,6 +1,7 @@
 #include "../hdr/common.h"
 #include "../hdr/utils.h"
 #include "../hdr/houses.h"
+#include "../hdr/places.h"
 #include "../hdr/menu.h"
 
 void	createaleak()
@@ -44,7 +45,7 @@ void	print_houses(t_houses *node)
 	}	
 }
 
-int	init(char *map_name, t_houses **houses) // add t_places
+int	init_houses(char *map_name, t_houses **houses) // add t_places
 {
 	*houses = init_list_houses(map_name);
 	
@@ -53,11 +54,22 @@ int	init(char *map_name, t_houses **houses) // add t_places
 	return EXIT_SUCCESS;
 }
 
+int init_places(char *map_name, t_places **places)
+{
+    *places = init_list_places(map_name);
+
+	if (!*places)
+		return EXIT_FAILURE;
+	return EXIT_SUCCESS;
+
+}
+
 int main()
 {
     bool		exit = false;
     int			option;
     t_houses	*houses = NULL;
+    t_places    *places = NULL;
 	double		coordinates[2];
 
 
@@ -67,23 +79,32 @@ int main()
 	if (!map_name)
 		return EXIT_FAILURE;
 
-	if (init(map_name, &houses))
+	if (init_houses(map_name, &houses))
     {
         printf("AQUI Error loading map\n");
         free(map_name);
 		return EXIT_FAILURE;
     }
 
+    if (init_places(map_name, &places))
+    {
+        printf("AQUI Error loading map\n");
+        free(map_name);
+		return EXIT_FAILURE;
+    }
+
+    
+
     while (!exit)
     {
 
-        option = action_menu();
+        option = action_menu(); //Chooses if introducing origin, destination, etc
 
-        switch (option)
+        switch (option) //
         {
             case 1: 
             {
-				if (menu(coordinates, &houses))
+				if (menu(coordinates, &houses, &places)) //Menu returns either 0 (success) or 1 (failure)
 					printf("Location not found\n");
 				else
 					printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
