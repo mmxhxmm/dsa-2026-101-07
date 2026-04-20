@@ -142,6 +142,11 @@ int	menu(double *coordinates, t_houses **list_houses, t_places **list_places)
     printf("\nMap loaded. Where are you? Address (1), Place (2), Coordinate (3): ");
     int option = input_int();
 
+    while(option <1 || option >3){
+        printf("\nInvalid Option! Enter again: ");
+        option=input_int();
+    }
+
     switch(option)
     {
         case 1:
