@@ -19,7 +19,7 @@ char *input_str(int max) {
       *p = '\0';
       return str;
     } else {
-      printf("Error: El string supera los %d caracteres.\n", max);
+      printf("Error: the string has more than %d characters\n", max);
 
       int c;
       while ((c = getchar()) != '\n' && c != EOF)
