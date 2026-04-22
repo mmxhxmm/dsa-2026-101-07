@@ -77,13 +77,13 @@ int main() {
     return EXIT_FAILURE;
 
   if (init_houses(map_name, &houses)) {
-    printf("AQUI Error loading map\n");
+    printf("Error loading map\n");
     free(map_name);
     return EXIT_FAILURE;
   }
 
   if (init_places(map_name, &places)) {
-    printf("AQUI Error loading map\n");
+    printf("Error loading map\n");
     free(map_name);
     return EXIT_FAILURE;
   }

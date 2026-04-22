@@ -199,7 +199,6 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
 
   char *buf = input_str(10);
   if (!buf) {
-    free(names);
     return NULL;
   }
   int choice = atoi(buf);

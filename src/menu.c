@@ -103,11 +103,11 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   t_place *result = search_place(list, name_place);
 
+  free(name_place);
   // Exact search
   if (result) {
     coordinates[0] = result->lat;
     coordinates[1] = result->lon;
-    free(name_place);
     return EXIT_SUCCESS;
   }
 
