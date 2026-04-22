@@ -81,7 +81,6 @@ int main() {
     return EXIT_FAILURE;
   }
 
-
   if (init_places(map_name, &places)) {
     printf("Error loading map\n");
     free(map_name);
