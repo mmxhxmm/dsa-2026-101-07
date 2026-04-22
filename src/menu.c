@@ -2,6 +2,7 @@
 #include "../hdr/houses.h"
 #include "../hdr/places.h"
 #include "../hdr/utils.h"
+#include <stdlib.h>
 
 void origin_info(t_house o) {
   printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);
@@ -155,8 +156,8 @@ int menu(double *coordinates, t_houses **list_houses, t_places **list_places) {
     break;
   case 3:
     printf("Not handled yet!\n");
+    return EXIT_FAILURE;
     // handle_place_search(list);
-    break;
   }
   return EXIT_SUCCESS;
 }
