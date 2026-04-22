@@ -45,12 +45,13 @@ t_places *init_list_places(const char *map_name) {
 ** Returns the matched t_house, or an empty t_house if nothing is found.
 */
 int handle_address_search(double *coordinates, t_houses *list) {
-  printf("Enter street number: ");
-  int num = input_int();
 
   printf("\nEnter street name (e.g. Carrer de Roc Boronat): ");
 
   char *name = input_str(50);
+
+  printf("Enter street number: ");
+  int num = input_int();
 
   // exact match first
   t_house *result = search_house_addr(list, name, num);
