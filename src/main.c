@@ -23,8 +23,7 @@ void free_houses(t_houses *list) {
   }
 }
 
-void free_places (t_places * list)
-{
+void free_places(t_places *list) {
   t_places *temp;
 
   while (list) {
@@ -119,10 +118,9 @@ int main() {
       break;
     }
   }
-  
+
   free(map_name);
   free_houses(houses);
   free_places(places);
   return 0;
-
 }

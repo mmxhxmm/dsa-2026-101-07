@@ -50,9 +50,9 @@ int handle_address_search(double *coordinates, t_houses *list) {
 
   char *name = input_str(50);
 
-  while(!name){
+  while (!name) {
     printf("\nIntroduce name again: ");
-    name=input_str(50);
+    name = input_str(50);
   }
 
   printf("Enter street number: ");
@@ -107,9 +107,9 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   char *name_place = input_str(50);
 
-  while(!name_place){
+  while (!name_place) {
     printf("\nIntroduce name again: ");
-    name_place=input_str(50);
+    name_place = input_str(50);
   }
 
   t_place *result = search_place(list, name_place);
