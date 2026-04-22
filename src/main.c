@@ -81,9 +81,11 @@ int main() {
     return EXIT_FAILURE;
   }
 
+
   if (init_places(map_name, &places)) {
     printf("Error loading map\n");
     free(map_name);
+    free_houses(houses);
     return EXIT_FAILURE;
   }
 
@@ -93,14 +95,13 @@ int main() {
 
     switch (option) //
     {
-    case 1: {
+    case 1:
       if (menu(coordinates, &houses,
                &places)) // Menu returns either 0 (success) or 1 (failure)
         printf("Location not found\n");
       else
         printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
       break;
-    }
 
     case 2:
       if (coordinates[0] != 0)
