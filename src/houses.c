@@ -234,7 +234,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
 
   printf("Street \"%s\" not found. Did you mean:\n", name);
   for (int i = 0; i < show; i++)
-    printf("  %d. %s\n", i + 1, filtered[i]);
+    printf("\033[34m   %d. %s\n", i + 1, filtered[i]);
   printf("  0. Cancel\n");
   if(show == 1){
       printf("Choose (enter number 1): ");
