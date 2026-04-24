@@ -100,7 +100,6 @@ int handle_address_search(double *coordinates, t_houses *list) {
   }
   return EXIT_FAILURE;
 }
-
 int handle_place_search(double *coordinates, t_places *list) {
 
   printf("\nEnter place name (e.g. L'Illa Diagonal): ");
@@ -114,8 +113,11 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   t_place *result = search_place(list, name_place);
 
+  if (!result)
+    result = suggest_similar_places(list, name_place);
+
   free(name_place);
-  // Exact search
+
   if (result) {
     coordinates[0] = result->lat;
     coordinates[1] = result->lon;
