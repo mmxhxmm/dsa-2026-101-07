@@ -23,7 +23,15 @@ void free_houses(t_houses *list) {
   }
 }
 
-void free_all(t_houses *node) { free_houses(node); }
+void free_places(t_places *list) {
+  t_places *temp;
+
+  while (list) {
+    temp = list;
+    list = list->next;
+    free(temp);
+  }
+}
 
 /* D E L E T E */
 void print_houses(t_houses *node) {
@@ -68,14 +76,15 @@ int main() {
     return EXIT_FAILURE;
 
   if (init_houses(map_name, &houses)) {
-    printf("AQUI Error loading map\n");
+    printf("Error loading map\n");
     free(map_name);
     return EXIT_FAILURE;
   }
 
   if (init_places(map_name, &places)) {
-    printf("AQUI Error loading map\n");
+    printf("Error loading map\n");
     free(map_name);
+    free_houses(houses);
     return EXIT_FAILURE;
   }
 
@@ -85,14 +94,13 @@ int main() {
 
     switch (option) //
     {
-    case 1: {
+    case 1:
       if (menu(coordinates, &houses,
                &places)) // Menu returns either 0 (success) or 1 (failure)
         printf("Location not found\n");
       else
         printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
       break;
-    }
 
     case 2:
       if (coordinates[0] != 0)
@@ -111,6 +119,8 @@ int main() {
     }
   }
 
-  free_all(houses);
+  free(map_name);
+  free_houses(houses);
+  free_places(places);
   return 0;
 }

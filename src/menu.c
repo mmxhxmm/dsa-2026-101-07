@@ -2,6 +2,7 @@
 #include "../hdr/houses.h"
 #include "../hdr/places.h"
 #include "../hdr/utils.h"
+#include <stdlib.h>
 
 void origin_info(t_house o) {
   printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);
@@ -45,12 +46,18 @@ t_places *init_list_places(const char *map_name) {
 ** Returns the matched t_house, or an empty t_house if nothing is found.
 */
 int handle_address_search(double *coordinates, t_houses *list) {
-  printf("Enter street number: ");
-  int num = input_int();
 
   printf("\nEnter street name (e.g. Carrer de Roc Boronat): ");
 
   char *name = input_str(50);
+
+  while (!name) {
+    printf("\nIntroduce name again: ");
+    name = input_str(50);
+  }
+
+  printf("Enter street number: ");
+  int num = input_int();
 
   // exact match first
   t_house *result = search_house_addr(list, name, num);
@@ -101,13 +108,18 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   char *name_place = input_str(50);
 
+  while (!name_place) {
+    printf("\nIntroduce name again: ");
+    name_place = input_str(50);
+  }
+
   t_place *result = search_place(list, name_place);
 
+  free(name_place);
   // Exact search
   if (result) {
     coordinates[0] = result->lat;
     coordinates[1] = result->lon;
-    free(name_place);
     return EXIT_SUCCESS;
   }
 
@@ -144,8 +156,8 @@ int menu(double *coordinates, t_houses **list_houses, t_places **list_places) {
     break;
   case 3:
     printf("Not handled yet!\n");
+    return EXIT_FAILURE;
     // handle_place_search(list);
-    break;
   }
   return EXIT_SUCCESS;
 }
