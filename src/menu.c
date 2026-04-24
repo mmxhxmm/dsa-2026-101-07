@@ -18,7 +18,6 @@ t_houses *init_list_houses(const char *map_name) {
 
   if (!map_name)
     return NULL;
-  printf("./maps/%s/houses.txt\n", map_name);
   snprintf(file_path, sizeof(file_path), "./maps/%s/houses.txt", map_name);
 
   return load_houses_from_file(file_path);
@@ -152,7 +151,6 @@ int menu(double *coordinates, t_houses **list_houses, t_places **list_places) {
   case 2:
     if (handle_place_search(coordinates, *list_places))
       return EXIT_FAILURE;
-
     break;
   case 3:
     printf("Not handled yet!\n");

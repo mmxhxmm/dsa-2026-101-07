@@ -4,10 +4,6 @@
 #include "../hdr/places.h"
 #include "../hdr/utils.h"
 
-void createaleak() {
-  char *foo = malloc(20 * sizeof(char));
-  printf("Allocated leaking string: %s", foo);
-}
 
 /*
 ** Frees all nodes in a houses linked list.
@@ -65,13 +61,14 @@ int init_places(char *map_name, t_places **places) {
 int main() {
   bool exit = false;
   int option;
-  t_houses *houses = NULL;
-  t_places *places = NULL;
-  double coordinates[2];
+  t_houses	*houses = NULL;
+  t_places	*places = NULL;
+  double	coordinates[2];
 
   printf("\n\t--------- WELCOME to NPM-MAPS ------------\n");
   printf("Enter map name (ex: xs_1, xl_1, ...): ");
   char *map_name = input_str(20);
+
   if (!map_name)
     return EXIT_FAILURE;
 

@@ -14,7 +14,8 @@
 int compare_streets(const char *search, const char *list_name) {
   if (strcasecmp(search, list_name) == 0)
     return 1;
-  const char *list_rest = strchr(list_name, ' ');
+
+  const char  *list_rest = strchr(list_name, ' ');
   if (!list_rest)
     return 0;
   list_rest++;
@@ -146,8 +147,10 @@ void print_valid_numbers(t_houses *list, const char *name) {
 t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   // collect unique street names
   int capacity = 64;
-  char **names = malloc(capacity * sizeof(char *));
   int count = 0;
+  char **names = malloc(capacity * sizeof(char *));
+  if (!name)
+      return NULL;
 
   t_houses *cur = list;
   while (cur) {
@@ -160,7 +163,12 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     if (!dup) {
       if (count >= capacity) {
         capacity *= 2;
-        names = realloc(names, capacity * sizeof(char *));
+        char **tmp = realloc(names, capacity * sizeof(char *));
+	if (!tmp) {
+	    free(names);
+	    return NULL;
+	}
+	names = tmp;
       }
       names[count++] = cur->house.st_name;
     }
