@@ -179,11 +179,12 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     names[j + 1] = key;
   }
 
-int show = 0;
+// only show streets with distance <= 10 AND sharing at least one word, max 5
+  char *filtered[5];
+  int show = 0;
   for (int i = 0; i < count && show < 5; i++) {
     if (lev_distance(name, names[i]) > 10)
       continue;
-    // check if they share at least one meaningful word
     char input_copy[200];
     char cand_copy[200];
     strncpy(input_copy, name, sizeof(input_copy) - 1);
@@ -193,7 +194,6 @@ int show = 0;
     int shared = 0;
     char *w1 = strtok(input_copy, " ");
     while (w1 && !shared) {
-      // skip generic street words
       if (strcasecmp(w1, "carrer") == 0 || strcasecmp(w1, "de") == 0
           || strcasecmp(w1, "del") == 0 || strcasecmp(w1, "avinguda") == 0
           || strcasecmp(w1, "passatge") == 0 || strcasecmp(w1, "passeig") == 0) {
@@ -211,12 +211,11 @@ int show = 0;
         }
         w2 = strtok(NULL, " ");
       }
-      // restore cand_copy for next w1 iteration
       strncpy(cand_copy, names[i], sizeof(cand_copy) - 1);
       w1 = strtok(NULL, " ");
     }
     if (shared)
-      show++;
+      filtered[show++] = names[i];
   }
 
   if (show == 0) {
@@ -227,12 +226,13 @@ int show = 0;
 
   printf("Street \"%s\" not found. Did you mean:\n", name);
   for (int i = 0; i < show; i++)
-    printf("  %d. %s\n", i + 1, names[i]);
+    printf("  %d. %s\n", i + 1, filtered[i]);
   printf("  0. Cancel\n");
   printf("Choose (enter number 1-%d): ", show);
 
   char *buf = input_str(10);
   if (!buf) {
+    free(names);
     return NULL;
   }
   int choice = atoi(buf);
@@ -243,9 +243,8 @@ int show = 0;
     return NULL;
   }
 
-  // copy chosen street name before freeing
   char chosen[100];
-  strncpy(chosen, names[choice - 1], sizeof(chosen) - 1);
+  strncpy(chosen, filtered[choice - 1], sizeof(chosen) - 1);
   chosen[sizeof(chosen) - 1] = '\0';
   free(names);
 
