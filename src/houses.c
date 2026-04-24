@@ -179,11 +179,45 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     names[j + 1] = key;
   }
 
-  // only show streets with distance <= 10, max 5
-  int show = 0;
-  for (int i = 0; i < count && show < 5; i++)
-    if (lev_distance(name, names[i]) <= 10)
+int show = 0;
+  for (int i = 0; i < count && show < 5; i++) {
+    if (lev_distance(name, names[i]) > 10)
+      continue;
+    // check if they share at least one meaningful word
+    char input_copy[200];
+    char cand_copy[200];
+    strncpy(input_copy, name, sizeof(input_copy) - 1);
+    strncpy(cand_copy, names[i], sizeof(cand_copy) - 1);
+    input_copy[sizeof(input_copy) - 1] = '\0';
+    cand_copy[sizeof(cand_copy) - 1] = '\0';
+    int shared = 0;
+    char *w1 = strtok(input_copy, " ");
+    while (w1 && !shared) {
+      // skip generic street words
+      if (strcasecmp(w1, "carrer") == 0 || strcasecmp(w1, "de") == 0
+          || strcasecmp(w1, "del") == 0 || strcasecmp(w1, "avinguda") == 0
+          || strcasecmp(w1, "passatge") == 0 || strcasecmp(w1, "passeig") == 0) {
+        w1 = strtok(NULL, " ");
+        continue;
+      }
+      char *w2 = strtok(cand_copy, " ");
+      while (w2) {
+        if (strcasecmp(w2, "carrer") != 0 && strcasecmp(w2, "de") != 0
+            && strcasecmp(w2, "del") != 0 && strcasecmp(w2, "avinguda") != 0
+            && strcasecmp(w2, "passatge") != 0 && strcasecmp(w2, "passeig") != 0
+            && strcasecmp(w1, w2) == 0) {
+          shared = 1;
+          break;
+        }
+        w2 = strtok(NULL, " ");
+      }
+      // restore cand_copy for next w1 iteration
+      strncpy(cand_copy, names[i], sizeof(cand_copy) - 1);
+      w1 = strtok(NULL, " ");
+    }
+    if (shared)
       show++;
+  }
 
   if (show == 0) {
     printf("Street \"%s\" not found and no similar streets found.\n", name);
