@@ -101,6 +101,33 @@ int handle_address_search(double *coordinates, t_houses *list) {
   }
   return EXIT_FAILURE;
 }
+int handle_place_search(double *coordinates, t_places *list) {
+
+  printf("\nEnter place name (e.g. L'Illa Diagonal): ");
+
+  char *name_place = input_str(50);
+
+  while (!name_place) {
+    printf("\nIntroduce name again: ");
+    name_place = input_str(50);
+  }
+
+  t_place *result = search_place(list, name_place);
+
+  if (!result)
+    result = suggest_similar_places(list, name_place);
+
+  free(name_place);
+
+  if (result) {
+    coordinates[0] = result->lat;
+    coordinates[1] = result->lon;
+    return EXIT_SUCCESS;
+  }
+
+  return EXIT_FAILURE;
+}
+/*
 
 int handle_place_search(double *coordinates, t_places *list) {
 
@@ -125,7 +152,7 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   return EXIT_FAILURE;
 }
-
+*/
 /*
 ** Main menu function. Asks the user for a map name and loads it,
 ** then asks how they want to search for their position:
