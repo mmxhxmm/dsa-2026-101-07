@@ -133,8 +133,16 @@ void print_valid_numbers(t_houses *list, const char *name) {
 }
 // Testing if it's the correct way 
 static const char *skip_prefix(const char *s) {
-  const char *prefixes[] = {"carrer de ", "carrer del ", "avinguda ",
-                             "passeig de ", "passatge de ", "carrer ", NULL};
+  const char *prefixes[] = {
+    "carrer de la ", "carrer de les ", "carrer de l'",
+    "carrer del ", "carrer de ", "carrer ",
+    "avinguda de la ", "avinguda de ", "avinguda ",
+    "passeig de ", "passatge de ",
+    "c. de la ", "c. de les ", "c. del ", "c. de ", "c. ",
+    "av. de ", "av. ",
+    "pg. de ", "pg. ",
+    NULL
+  };
   for (int i = 0; prefixes[i]; i++) {
     int len = strlen(prefixes[i]);
     if (strncasecmp(s, prefixes[i], len) == 0)
