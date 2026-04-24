@@ -1,4 +1,38 @@
 #include "../hdr/common.h"
+#include <ctype.h>
+
+void to_lower(char *s)
+{
+    if (!s)
+        return;
+
+    while (*s)
+    {
+        *s = (char)tolower((unsigned char)*s);
+        s++;
+    }
+}
+
+int strcmp_from(char *s1, char *s2, char c)
+{
+    if (!s1 || !s2)
+        return 0;
+
+    to_lower(s1);
+    to_lower(s2);
+
+    while (*s1 && *s1 != c)
+        s1++;
+    while (*s2 && *s2 != c)
+        s2++;
+
+    if (*s1 == c)
+        s1++;
+    if (*s2 == c)
+        s2++;
+
+    return strcmp(s1, s2);
+}
 
 /*
     @param:     maximum size of the string to read
@@ -19,7 +53,7 @@ char *input_str(int max) {
       *p = '\0';
       return str;
     } else {
-      printf("Error: the string has more than %d characters\n", max);
+      printf("Error: too much long\n", max);
 
       int c;
       while ((c = getchar()) != '\n' && c != EOF)
@@ -75,5 +109,6 @@ int lev_distance(const char *a, const char *b) {
           del < ins ? (del < sub ? del : sub) : (ins < sub ? ins : sub);
     }
   }
+
   return matrix[la][lb];
 }

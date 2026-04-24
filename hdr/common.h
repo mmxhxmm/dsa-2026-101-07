@@ -9,6 +9,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#define SOFT_GREEN  "\033[93m"
+#define RESET       "\033[0m"
+
 typedef struct s_house {
   char st_name[100];
   int num;
