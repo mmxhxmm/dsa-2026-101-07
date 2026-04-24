@@ -99,7 +99,7 @@ int main() {
                &places)) // Menu returns either 0 (success) or 1 (failure)
         printf("Location not found\n");
       else
-        printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
+      printf("\t\033[33mFound at (%.6f, %.6f)\033[0m\n", coordinates[0], coordinates[1]);
       break;
 
     case 2:
