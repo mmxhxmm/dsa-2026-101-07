@@ -184,7 +184,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     }
     cur = cur->next;
   }
-const char *name_core = skip_prefix(name);
+  const char *name_core = skip_prefix(name);
 
   // sort by levenshtein distance on the CORE part only
   for (int i = 1; i < count; i++) {
@@ -198,11 +198,22 @@ const char *name_core = skip_prefix(name);
     names[j + 1] = key;
   }
 
-  // only show streets whose core is within distance 5, max 5
+  // threshold scales with length: short words need tighter match
+  int core_len = strlen(name_core);
+  int threshold;
+  if (core_len <= 4)
+    threshold = 1;
+  else if (core_len <= 7)
+    threshold = 2;
+  else if (core_len <= 12)
+    threshold = 3;
+  else
+    threshold = 4;
+
   char *filtered[5];
   int show = 0;
   for (int i = 0; i < count && show < 5; i++)
-    if (lev_distance(name_core, skip_prefix(names[i])) <= 5)
+    if (lev_distance(name_core, skip_prefix(names[i])) <= threshold)
       filtered[show++] = names[i];
 
   if (show == 0) {
