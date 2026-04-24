@@ -237,7 +237,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     printf("  %d. %s\n", i + 1, filtered[i]);
   printf("  0. Cancel\n");
   if(show == 1){
-      printf("Choose (enter number 1): ", show);
+      printf("Choose (enter number 1): ");
   }else{
       printf("Choose (enter number 1-%d): ", show);
   }
