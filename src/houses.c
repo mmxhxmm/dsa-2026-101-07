@@ -14,19 +14,31 @@
 int compare_streets(const char *search, const char *list_name) {
   if (strcasecmp(search, list_name) == 0)
     return 1;
+  const char *search_rest = strchr(search, ' ');
+  if (search_rest) search_rest++;
   const char *list_rest = strchr(list_name, ' ');
-  if (!list_rest)
-    return 0;
-  list_rest++;
-  if (strncasecmp(search, "C. ", 3) == 0)
+  if (list_rest) list_rest++;
+  // user typed abbreviation-> match full name in list
+  if (strncasecmp(search, "C. ", 3) == 0 && list_rest)
     if (strcasecmp(search + 3, list_rest) == 0)
       return 1;
-  if (strncasecmp(search, "Av. ", 4) == 0)
+  if (strncasecmp(search, "Av. ", 4) == 0 && list_rest)
     if (strcasecmp(search + 4, list_rest) == 0)
       return 1;
-  if (strncasecmp(search, "Pg. ", 4) == 0)
+  if (strncasecmp(search, "Pg. ", 4) == 0 && list_rest)
     if (strcasecmp(search + 4, list_rest) == 0)
       return 1;
+  // user typed full name--> match abbreviation in list 
+  if (strncasecmp(list_name, "C. ", 3) == 0 && search_rest)
+    if (strcasecmp(list_name + 3, search_rest) == 0)
+      return 1;
+  if (strncasecmp(list_name, "Av. ", 4) == 0 && search_rest)
+    if (strcasecmp(list_name + 4, search_rest) == 0)
+      return 1;
+  if (strncasecmp(list_name, "Pg. ", 4) == 0 && search_rest)
+    if (strcasecmp(list_name + 4, search_rest) == 0)
+      return 1;
+
   return 0;
 }
 
