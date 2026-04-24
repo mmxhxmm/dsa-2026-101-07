@@ -54,7 +54,12 @@ t_place *search_place(t_places *list, const char *name) {
   }
   return NULL;
 }
-
+/* Adding suggest similar places
+* Firstky, it loads all the places name available
+* Checck the levenshtien distance(same as the houses one)
+* Apply multiple threshold scales to teh input's len
+* Filter the options and show the most similar one
+*/
 t_place *suggest_similar_places(t_places *list, const char *name) {
   // collect unique place names
   int capacity = 64;
