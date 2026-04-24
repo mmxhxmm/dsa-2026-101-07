@@ -131,6 +131,12 @@ void print_valid_numbers(t_houses *list, const char *name) {
   }
   printf("\n");
 }
+// For testing only 
+static int core_starts_with(const char *candidate, const char *input) {
+  int len = strlen(input);
+  if (len == 0) return 0;
+  return strncasecmp(candidate, input, len) == 0;
+}
 // Testing if it's the correct way 
 static const char *skip_prefix(const char *s) {
   const char *prefixes[] = {
@@ -211,10 +217,14 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     threshold = 4;
 
   char *filtered[5];
-  int show = 0;
-  for (int i = 0; i < count && show < 5; i++)
-    if (lev_distance(name_core, skip_prefix(names[i])) <= threshold)
-      filtered[show++] = names[i];
+    int show = 0;
+    for (int i = 0; i < count && show < 5; i++) {
+      const char *cand_core = skip_prefix(names[i]);
+      int dist = lev_distance(name_core, cand_core);
+      int starts = core_starts_with(cand_core, name_core);
+      if (dist <= threshold || starts)
+        filtered[show++] = names[i];
+    }
 
   if (show == 0) {
     printf("Street \"%s\" not found and no similar streets found.\n", name);
