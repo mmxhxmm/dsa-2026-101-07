@@ -1,39 +1,6 @@
 #include "../hdr/common.h"
 #include <ctype.h>
 
-void to_lower(char *s)
-{
-    if (!s)
-        return;
-
-    while (*s)
-    {
-        *s = (char)tolower((unsigned char)*s);
-        s++;
-    }
-}
-
-int strcmp_from(char *s1, char *s2, char c)
-{
-    if (!s1 || !s2)
-        return 0;
-
-    to_lower(s1);
-    to_lower(s2);
-
-    while (*s1 && *s1 != c)
-        s1++;
-    while (*s2 && *s2 != c)
-        s2++;
-
-    if (*s1 == c)
-        s1++;
-    if (*s2 == c)
-        s2++;
-
-    return strcmp(s1, s2);
-}
-
 /*
     @param:     maximum size of the string to read
     @def:       reads from stdin a string with the correct length
