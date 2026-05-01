@@ -77,3 +77,6 @@ int lev_distance(const char *a, const char *b) {
   }
   return matrix[la][lb];
 }
+
+
+//Defines omputes the midpoint of 2 coordinates

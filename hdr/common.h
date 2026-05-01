@@ -33,4 +33,24 @@ typedef struct s_places {
 
 } t_places;
 
+typedef struct s_street {
+  int from_intersaction_id;
+  double from_intersection_lat;
+  double from_intersection_lon;
+
+  int to_intersection_id;
+  double to_intersection_lat;
+  double to_intersection_lon;
+  // int length_meters;   Probably not needed
+  char st_name;
+  
+} t_street;
+
+typedef  struct s_streets {
+
+  t_street street;
+  struct s_streets *next;
+
+} t_streets;
+
 #endif

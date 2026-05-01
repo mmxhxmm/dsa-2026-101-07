@@ -38,9 +38,11 @@ t_streets *load_streets_from_file(const char *file_name) {
   while (fscanf(file, " %d, %lf, %lf, %d, %lf, %lf, %*[^,], %99[^,]", tmp.from_intersaction_id, &tmp.from_intersection_lat,
                 &tmp.from_intersection_lon, &tmp.to_intersection_id, &tmp.to_intersection_lat, &tmp.to_intersection_lon, &tmp.st_name) == 7) {
     counter++;
-    add_street_t3o_list(&list, tmp);
+    add_street_to_list(&list, tmp);
   }
   printf("%d streets loaded\n", counter);
   fclose(file);
   return list;
 }
+
+
