@@ -2,6 +2,7 @@
 #include "../hdr/houses.h"
 #include "../hdr/menu.h"
 #include "../hdr/places.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
 
 
@@ -21,6 +22,16 @@ void free_houses(t_houses *list) {
 
 void free_places(t_places *list) {
   t_places *temp;
+
+  while (list) {
+    temp = list;
+    list = list->next;
+    free(temp);
+  }
+}
+
+void free_streets(t_streets *list) {
+  t_streets *temp;
 
   while (list) {
     temp = list;
@@ -58,12 +69,27 @@ int init_places(char *map_name, t_places **places) {
   return EXIT_SUCCESS;
 }
 
+int init_streets(char *map_name, t_streets **streets) {
+  *streets = init_list_streets(map_name);
+
+  if (!*streets)
+    return EXIT_FAILURE;
+  return EXIT_SUCCESS;
+}
+
 int main() {
   bool exit = false;
   int option;
+<<<<<<< HEAD
   t_houses	*houses = NULL;
   t_places	*places = NULL;
   double	coordinates[2];
+=======
+  t_houses *houses = NULL;
+  t_places *places = NULL;
+  t_streets *streets = NULL;
+  double coordinates[2];
+>>>>>>> 1506ffd ([LAB 4] Almost finished version)
 
   printf("\n\t--------- WELCOME to NPM-MAPS ------------\n");
   printf("Enter map name (ex: xs_1, xl_1, ...): ");
@@ -85,6 +111,14 @@ int main() {
     return EXIT_FAILURE;
   }
 
+  if (init_streets(map_name, &streets)) {
+    printf("Error loading map\n");
+    free(map_name);
+    free_houses(houses);
+    free_places(places);
+    return EXIT_FAILURE;
+  }
+
   while (!exit) {
 
     option = action_menu(); // Chooses if introducing origin, destination, etc
@@ -96,7 +130,34 @@ int main() {
                &places)) // Menu returns either 0 (success) or 1 (failure)
         printf("Location not found\n");
       else
+<<<<<<< HEAD
       printf(SOFT_GREEN"\t>Found at (%.6f, %.6f)\n"RESET, coordinates[0], coordinates[1]);
+=======
+        printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
+        Position user_position={coordinates[0], coordinates[1]};
+        t_streets *closest_ptr=closest_street(streets, user_position);
+        t_street closest=closest_ptr->street;
+
+        printf("\nClosest street: %s", closest.st_name);
+        printf("\nBetween %lld (%lf, %lf) and %lld (%lf, %lf)", closest.from_intersaction_id, closest.from_intersection_lat, closest.from_intersection_lon, closest.to_intersection_id, closest.to_intersection_lat, closest.to_intersection_lon);
+
+        t_streets *connected_streets=NULL;
+        find_connected_streets(closest_ptr, streets, connected_streets);
+
+        printf("\nFrom this street segment, you can go to:");
+        printf("\n- %s", closest.st_name);
+        printf("\n\tWhich is connected to:");
+        t_streets *current=connected_streets;
+        while(!current){
+          printf("\n\t - %s", current->street.st_name);
+          current=current->next;
+        }
+
+        if(!current){
+          free_streets(connected_streets);
+        }
+
+>>>>>>> 1506ffd ([LAB 4] Almost finished version)
       break;
 
     case 2:
@@ -116,8 +177,11 @@ int main() {
     }
   }
 
+
+
   free(map_name);
   free_houses(houses);
   free_places(places);
+  free_streets(streets);
   return 0;
 }

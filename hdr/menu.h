@@ -9,6 +9,7 @@ int handle_place_search(double *coordinates, t_places *list);
 
 t_houses *init_list_houses(const char *map_name);
 t_places *init_list_places(const char *map_name);
+t_streets *init_list_streets(const char *map_name);
 
 int action_menu();
 void origin_info(t_house o);
