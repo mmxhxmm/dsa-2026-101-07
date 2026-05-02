@@ -1,6 +1,7 @@
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
 #include "../hdr/places.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
 #include <stdlib.h>
 
@@ -33,6 +34,17 @@ t_places *init_list_places(const char *map_name) {
   snprintf(file_path, sizeof(file_path), "./maps/%s/places.txt", map_name);
 
   return load_places_from_file(file_path);
+}
+
+t_streets *init_list_streets(const char *map_name) {
+  char file_path[100];
+
+  if (!map_name)
+    return NULL;
+  printf("./maps/%s/streets.txt\n", map_name);
+  snprintf(file_path, sizeof(file_path), "./maps/%s/streets.txt", map_name);
+
+  return load_streets_from_file(file_path);
 }
 
 /*

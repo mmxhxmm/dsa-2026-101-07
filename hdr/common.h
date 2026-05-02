@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+
 #include <ctype.h>
 #include <dirent.h>
 #include <stdbool.h>
@@ -8,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <math.h>
+
+
 
 typedef struct s_house {
   char st_name[100];
@@ -34,15 +38,15 @@ typedef struct s_places {
 } t_places;
 
 typedef struct s_street {
-  int from_intersaction_id;
+  long long from_intersaction_id;
   double from_intersection_lat;
   double from_intersection_lon;
 
-  int to_intersection_id;
+  long long to_intersection_id;
   double to_intersection_lat;
   double to_intersection_lon;
   // int length_meters;   Probably not needed
-  char st_name;
+  char st_name[100];
   
 } t_street;
 
@@ -52,5 +56,10 @@ typedef  struct s_streets {
   struct s_streets *next;
 
 } t_streets;
+
+typedef struct position {
+  double lat;
+  double lon;
+} Position;
 
 #endif
