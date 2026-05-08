@@ -31,15 +31,48 @@ t_streets *load_streets_from_file(const char *file_name) {
   t_streets *list = NULL;
   t_street tmp;
   int counter = 0;
+  char line[512];
 
   file = fopen(file_name, "r");
+
   if (!file)
     return NULL;
-  while (fscanf(file, " %lld, %lf, %lf, %lld, %lf, %lf, %*f, %99[^\n]", &tmp.from_intersaction_id, &tmp.from_intersection_lat,
-                &tmp.from_intersection_lon, &tmp.to_intersection_id, &tmp.to_intersection_lat, &tmp.to_intersection_lon, tmp.st_name) == 7) {
-    counter++;
-    add_street_to_list(&list, tmp);
-  }
+
+    while (fgets(line, sizeof(line), file))
+    {
+        int fields;
+
+        tmp.st_name[0] = '\0';
+
+        fields = sscanf(line,
+            "%lld,%lf,%lf,%lld,%lf,%lf,%*f,%99[^\n]",
+            &tmp.from_intersaction_id,
+            &tmp.from_intersection_lat,
+            &tmp.from_intersection_lon,
+            &tmp.to_intersection_id,
+            &tmp.to_intersection_lat,
+            &tmp.to_intersection_lon,
+            tmp.st_name
+        );
+
+        /*
+           sscanf returns 7 only if the street name was read.
+           Lines without a name will return 6, so skip them.
+        */
+        if (fields != 7)
+            continue;
+
+        /*
+           Optional: skip names that are only spaces.
+        */
+        if (tmp.st_name[0] == '\0')
+            continue;
+
+        add_street_to_list(&list, tmp);
+        counter++;
+    }
+
+
   printf("%d streets loaded\n", counter);
   fclose(file);
   return list;
@@ -76,10 +109,6 @@ t_streets *closest_street(t_streets* list_streets, Position user_position){
     if(closest_distance==-1 || current_distance < closest_distance){
       closest_distance=current_distance;
       closest_str=current_str;
-    }
-
-    if(strcmp(current_str->street.st_name, "Carrer de Roc Boronat")==0){
-      printf("\nDistance from Carrer de Roc Boronat: %lf", current_distance);
     }
 
     current_str=current_str->next;
