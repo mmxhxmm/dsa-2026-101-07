@@ -116,8 +116,6 @@ t_streets *closest_street(t_streets* list_streets, Position user_position){
 
   }
 
-  printf("\nDistance from closest street: %lf", closest_distance);
-  printf("\nIterated over %d streets", count);
 
   return closest_str;
 
@@ -125,7 +123,7 @@ t_streets *closest_street(t_streets* list_streets, Position user_position){
 
 //Function to find all the streets connected to the closest one, and return them as a new Linked list
 //Notice that connected means that the end-point of the closest-street is the start-point of the connected-street
-void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets *connected_streets){
+void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets **connected_streets){
 
   if(!head){
     printf("Head is NULL");
@@ -133,19 +131,17 @@ void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets *
   }
   t_streets *current=head;
 
-  while(!current){
+  while(current){
 
     t_street current_data=current->street;
 
     if(current_data.from_intersaction_id==closest_str->street.to_intersection_id){
 
-      add_street_to_list(&connected_streets, current_data);
+      add_street_to_list(connected_streets, current_data);
       
     }
     current=current->next;
   }
-
-  return;
 
 }
 
