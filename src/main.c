@@ -136,20 +136,22 @@ int main() {
         printf("\nBetween %lld (%lf, %lf) and %lld (%lf, %lf)", closest.from_intersaction_id, closest.from_intersection_lat, closest.from_intersection_lon, closest.to_intersection_id, closest.to_intersection_lat, closest.to_intersection_lon);
 
         t_streets *connected_streets=NULL;
-        find_connected_streets(closest_ptr, streets, connected_streets);
+        find_connected_streets(closest_ptr, streets, &connected_streets);
 
         printf("\nFrom this street segment, you can go to:");
         printf("\n- %s", closest.st_name);
         printf("\n\tWhich is connected to:");
         t_streets *current=connected_streets;
-        while(!current){
-          printf("\n\t - %s", current->street.st_name);
+        while(current){
+          printf("\n\t\t- %s", current->street.st_name);
           current=current->next;
         }
+        printf("\n\n");
 
-        if(!current){
+        if(connected_streets){
           free_streets(connected_streets);
         }
+
 
       break;
 
