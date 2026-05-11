@@ -136,6 +136,8 @@ int main() {
         printf("\nBetween %lld (%lf, %lf) and %lld (%lf, %lf)", closest.from_intersaction_id, closest.from_intersection_lat, closest.from_intersection_lon, closest.to_intersection_id, closest.to_intersection_lat, closest.to_intersection_lon);
 
         t_streets *connected_streets=NULL;
+
+
         find_connected_streets(closest_ptr, streets, &connected_streets);
 
         printf("\nFrom this street segment, you can go to:");
@@ -151,7 +153,6 @@ int main() {
         if(connected_streets){
           free_streets(connected_streets);
         }
-
 
       break;
 
