@@ -123,12 +123,18 @@ t_streets *closest_street(t_streets* list_streets, Position user_position){
 
 //Function to find all the streets connected to the closest one, and return them as a new Linked list
 //Notice that connected means that the end-point of the closest-street is the start-point of the connected-street
-void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets **connected_streets){
+void find_connected_streets_segment(t_streets* closest_str, t_streets* head, t_streets **connected_streets_to_segment){
 
-  if(!head){
-    printf("Head is NULL");
+  if(head == NULL){
+    printf("\nHead is NULL");
     return;
   }
+
+  if(closest_str == NULL){
+    printf("\nClosest_str is NULL");
+    return;
+  }
+
   t_streets *current=head;
 
   while(current){
@@ -137,12 +143,41 @@ void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets *
 
     if(current_data.from_intersaction_id==closest_str->street.to_intersection_id){
 
-      add_street_to_list(connected_streets, current_data);
+      int included=false;
+      t_streets *current_for_included_nodes=*connected_streets_to_segment;
+
+      while(current_for_included_nodes){
+        if(strcmp(current_for_included_nodes->street.st_name, current_data.st_name)==0)
+          included=true;
+        
+          current_for_included_nodes=current_for_included_nodes->next;
+  
+      }
+
+      if(included==false){
+        add_street_to_list(connected_streets_to_segment, current_data);
+      }
       
     }
     current=current->next;
   }
 
 }
+
+void find_connected_streets(t_streets* closest_str, t_streets* head, t_streets **connected_streets){
+
+  t_streets* current=head;
+
+  while(current){
+    if(strcmp(closest_str->street.st_name, current->street.st_name)==0){
+      find_connected_streets_segment(current, head, connected_streets);
+    }
+
+    current=current->next;
+      
+  }
+}
+
+
 
 
