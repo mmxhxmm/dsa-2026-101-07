@@ -134,19 +134,14 @@ int main() {
         printf("\nBetween %lld (%lf, %lf) and %lld (%lf, %lf)", closest.from_intersaction_id, closest.from_intersection_lat, closest.from_intersection_lon, closest.to_intersection_id, closest.to_intersection_lat, closest.to_intersection_lon);
 
         t_streets *connected_streets=NULL;
-<<<<<<< HEAD
 
 
         find_connected_streets(closest_ptr, streets, &connected_streets);
-=======
-        find_connected_streets(closest_ptr, streets, connected_streets);
->>>>>>> main
 
         printf("\nFrom this street segment, you can go to:");
         printf("\n- %s", closest.st_name);
         printf("\n\tWhich is connected to:");
         t_streets *current=connected_streets;
-<<<<<<< HEAD
         while(current){
           printf("\n\t\t- %s", current->street.st_name);
           current=current->next;
@@ -154,14 +149,6 @@ int main() {
         printf("\n\n");
 
         if(connected_streets){
-=======
-        while(!current){
-          printf("\n\t - %s", current->street.st_name);
-          current=current->next;
-        }
-
-        if(!current){
->>>>>>> main
           free_streets(connected_streets);
         }
 
@@ -184,11 +171,6 @@ int main() {
     }
   }
 
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> main
 
   free(map_name);
   free_houses(houses);

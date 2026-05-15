@@ -21,7 +21,7 @@ char *input_str(int max) {
       *p = '\0';
       return str;
     } else {
-      printf("Error: too much long\n", max);
+      printf("Error: too long (%d)\n", max);
 
       int c;
       while ((c = getchar()) != '\n' && c != EOF)
