@@ -35,8 +35,9 @@ t_streets *load_streets_from_file(const char *file_name) {
 
   file = fopen(file_name, "r");
 
-  if (!file)
+  if (!file){
     return NULL;
+  }
 
     while (fgets(line, sizeof(line), file))
     {
@@ -147,11 +148,11 @@ void find_connected_streets_segment(t_streets* closest_str, t_streets* head, t_s
       t_streets *current_for_included_nodes=*connected_streets_to_segment;
 
       while(current_for_included_nodes){
-        if(strcmp(current_for_included_nodes->street.st_name, current_data.st_name)==0)
+        if(strcmp(current_for_included_nodes->street.st_name, current_data.st_name)==0){
           included=true;
         
           current_for_included_nodes=current_for_included_nodes->next;
-  
+  	}
       }
 
       if(included==false){
