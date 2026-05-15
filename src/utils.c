@@ -79,3 +79,9 @@ int lev_distance(const char *a, const char *b) {
 
   return matrix[la][lb];
 }
+<<<<<<< HEAD
+=======
+
+
+//Defines omputes the midpoint of 2 coordinates
+>>>>>>> 7b9f717 (Some implementations of Street)
