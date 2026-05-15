@@ -5,10 +5,6 @@
 #include "../hdr/streets.h"
 #include "../hdr/utils.h"
 
-void createaleak() {
-  char *foo = malloc(20 * sizeof(char));
-  printf("Allocated leaking string: %s", foo);
-}
 
 /*
 ** Frees all nodes in a houses linked list.
@@ -92,6 +88,7 @@ int main() {
   printf("\n\t--------- WELCOME to NPM-MAPS ------------\n");
   printf("Enter map name (ex: xs_1, xl_1, ...): ");
   char *map_name = input_str(20);
+
   if (!map_name)
     return EXIT_FAILURE;
 
@@ -127,6 +124,7 @@ int main() {
                &places)) // Menu returns either 0 (success) or 1 (failure)
         printf("Location not found\n");
       else
+      printf(SOFT_GREEN"\t>Found at (%.6f, %.6f)\n"RESET, coordinates[0], coordinates[1]);
         printf("\tFound at (%.6f, %.6f)\n", coordinates[0], coordinates[1]);
         Position user_position={coordinates[0], coordinates[1]};
         t_streets *closest_ptr=closest_street(streets, user_position);
@@ -136,14 +134,19 @@ int main() {
         printf("\nBetween %lld (%lf, %lf) and %lld (%lf, %lf)", closest.from_intersaction_id, closest.from_intersection_lat, closest.from_intersection_lon, closest.to_intersection_id, closest.to_intersection_lat, closest.to_intersection_lon);
 
         t_streets *connected_streets=NULL;
+<<<<<<< HEAD
 
 
         find_connected_streets(closest_ptr, streets, &connected_streets);
+=======
+        find_connected_streets(closest_ptr, streets, connected_streets);
+>>>>>>> main
 
         printf("\nFrom this street segment, you can go to:");
         printf("\n- %s", closest.st_name);
         printf("\n\tWhich is connected to:");
         t_streets *current=connected_streets;
+<<<<<<< HEAD
         while(current){
           printf("\n\t\t- %s", current->street.st_name);
           current=current->next;
@@ -151,6 +154,14 @@ int main() {
         printf("\n\n");
 
         if(connected_streets){
+=======
+        while(!current){
+          printf("\n\t - %s", current->street.st_name);
+          current=current->next;
+        }
+
+        if(!current){
+>>>>>>> main
           free_streets(connected_streets);
         }
 
@@ -173,7 +184,11 @@ int main() {
     }
   }
 
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> main
 
   free(map_name);
   free_houses(houses);

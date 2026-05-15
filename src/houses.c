@@ -14,7 +14,8 @@
 int compare_streets(const char *search, const char *list_name) {
   if (strcasecmp(search, list_name) == 0)
     return 1;
-  const char *list_rest = strchr(list_name, ' ');
+
+  const char  *list_rest = strchr(list_name, ' ');
   if (!list_rest)
     return 0;
   list_rest++;
@@ -131,7 +132,31 @@ void print_valid_numbers(t_houses *list, const char *name) {
   }
   printf("\n");
 }
-
+// For testing only 
+static int core_starts_with(const char *candidate, const char *input) {
+  int len = strlen(input);
+  if (len == 0) return 0;
+  return strncasecmp(candidate, input, len) == 0;
+}
+// Testing if it's the correct way 
+static const char *skip_prefix(const char *s) {
+  const char *prefixes[] = {
+    "carrer de la ", "carrer de les ", "carrer de l'",
+    "carrer del ", "carrer de ", "carrer ",
+    "avinguda de la ", "avinguda de ", "avinguda ",
+    "passeig de ", "passatge de ",
+    "c. de la ", "c. de les ", "c. del ", "c. de ", "c. ",
+    "av. de ", "av. ",
+    "pg. de ", "pg. ",
+    NULL
+  };
+  for (int i = 0; prefixes[i]; i++) {
+    int len = strlen(prefixes[i]);
+    if (strncasecmp(s, prefixes[i], len) == 0)
+      return s + len;
+  }
+  return s;
+}
 /*
 ** Called when the user enters a street name that doesn't exist in the list.
 ** Steps:
@@ -146,8 +171,10 @@ void print_valid_numbers(t_houses *list, const char *name) {
 t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   // collect unique street names
   int capacity = 64;
-  char **names = malloc(capacity * sizeof(char *));
   int count = 0;
+  char **names = malloc(capacity * sizeof(char *));
+  if (!name)
+      return NULL;
 
   t_houses *cur = list;
   while (cur) {
@@ -160,30 +187,52 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     if (!dup) {
       if (count >= capacity) {
         capacity *= 2;
-        names = realloc(names, capacity * sizeof(char *));
+        char **tmp = realloc(names, capacity * sizeof(char *));
+	if (!tmp) {
+	    free(names);
+	    return NULL;
+	}
+	names = tmp;
       }
       names[count++] = cur->house.st_name;
     }
     cur = cur->next;
   }
+  const char *name_core = skip_prefix(name);
 
-  // sort by levenshtein distance
+  // sort by levenshtein distance on the CORE part only
   for (int i = 1; i < count; i++) {
     char *key = names[i];
-    int key_dist = lev_distance(name, key);
+    int key_dist = lev_distance(name_core, skip_prefix(key));
     int j = i - 1;
-    while (j >= 0 && lev_distance(name, names[j]) > key_dist) {
+    while (j >= 0 && lev_distance(name_core, skip_prefix(names[j])) > key_dist) {
       names[j + 1] = names[j];
       j--;
     }
     names[j + 1] = key;
   }
 
-  // only show streets with distance <= 10, max 5
-  int show = 0;
-  for (int i = 0; i < count && show < 5; i++)
-    if (lev_distance(name, names[i]) <= 10)
-      show++;
+  // threshold scales with length: short words need tighter match
+  int core_len = strlen(name_core);
+  int threshold;
+  if (core_len <= 4)
+    threshold = 1;
+  else if (core_len <= 7)
+    threshold = 2;
+  else if (core_len <= 12)
+    threshold = 3;
+  else
+    threshold = 4;
+
+  char *filtered[5];
+    int show = 0;
+    for (int i = 0; i < count && show < 5; i++) {
+      const char *cand_core = skip_prefix(names[i]);
+      int dist = lev_distance(name_core, cand_core);
+      int starts = core_starts_with(cand_core, name_core);
+      if (dist <= threshold || starts)
+        filtered[show++] = names[i];
+    }
 
   if (show == 0) {
     printf("Street \"%s\" not found and no similar streets found.\n", name);
@@ -193,25 +242,24 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
 
   printf("Street \"%s\" not found. Did you mean:\n", name);
   for (int i = 0; i < show; i++)
-    printf("  %d. %s\n", i + 1, names[i]);
+    printf("\033[96m  %d. %s\n", i + 1, filtered[i]);
   printf("  0. Cancel\n");
-  printf("Choose (enter number 1-%d): ", show);
+  if(show == 1){
+      printf("Choose (enter number 1): ");
+  }else{
+      printf("Choose (enter number 1-%d): ", show);
+  }
+
 
   char *buf = input_str(10);
-  if (!buf) {
-    return NULL;
-  }
+  if (!buf) { free(names); return NULL; }
   int choice = atoi(buf);
   free(buf);
 
-  if (choice <= 0 || choice > show) {
-    free(names);
-    return NULL;
-  }
+  if (choice <= 0 || choice > show) { free(names); return NULL; }
 
-  // copy chosen street name before freeing
   char chosen[100];
-  strncpy(chosen, names[choice - 1], sizeof(chosen) - 1);
+  strncpy(chosen, filtered[choice - 1], sizeof(chosen) - 1);
   chosen[sizeof(chosen) - 1] = '\0';
   free(names);
 

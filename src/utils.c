@@ -1,5 +1,9 @@
 #include "../hdr/common.h"
+<<<<<<< HEAD
 #define EARTH_RADIUS 6371.0
+=======
+#include <ctype.h>
+>>>>>>> main
 
 /*
     @param:     maximum size of the string to read
@@ -20,7 +24,7 @@ char *input_str(int max) {
       *p = '\0';
       return str;
     } else {
-      printf("Error: the string has more than %d characters\n", max);
+      printf("Error: too much long\n", max);
 
       int c;
       while ((c = getchar()) != '\n' && c != EOF)
@@ -76,10 +80,12 @@ int lev_distance(const char *a, const char *b) {
           del < ins ? (del < sub ? del : sub) : (ins < sub ? ins : sub);
     }
   }
+
   return matrix[la][lb];
 }
 
 
+<<<<<<< HEAD
 //Computes the midpoint between 2 coordinates
 //It uses 2 struct-variables called "position" as inputs, and returns a "position" struct, which would be the mid-point.
 
@@ -137,3 +143,6 @@ double haversine(Position posA, Position posB) {
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return EARTH_RADIUS * c;
 }
+=======
+//Defines omputes the midpoint of 2 coordinates
+>>>>>>> main

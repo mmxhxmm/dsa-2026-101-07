@@ -141,7 +141,11 @@ void find_connected_streets_segment(t_streets* closest_str, t_streets* head, t_s
 
     t_street current_data=current->street;
 
+<<<<<<< HEAD
     if(current_data.from_intersaction_id==closest_str->street.to_intersection_id){
+=======
+    if((current_data.from_intersaction_id==closest_str->street.to_intersection_id) ||(current_data.to_intersection_id==closest_str->street.from_intersaction_id)){
+>>>>>>> main
 
       int included=false;
       t_streets *current_for_included_nodes=*connected_streets_to_segment;

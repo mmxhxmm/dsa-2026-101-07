@@ -19,7 +19,6 @@ t_houses *init_list_houses(const char *map_name) {
 
   if (!map_name)
     return NULL;
-  printf("./maps/%s/houses.txt\n", map_name);
   snprintf(file_path, sizeof(file_path), "./maps/%s/houses.txt", map_name);
 
   return load_houses_from_file(file_path);
@@ -113,7 +112,6 @@ int handle_address_search(double *coordinates, t_houses *list) {
   }
   return EXIT_FAILURE;
 }
-
 int handle_place_search(double *coordinates, t_places *list) {
 
   printf("\nEnter place name (e.g. L'Illa Diagonal): ");
@@ -127,8 +125,11 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   t_place *result = search_place(list, name_place);
 
+  if (!result)
+    result = suggest_similar_places(list, name_place);
+
   free(name_place);
-  // Exact search
+
   if (result) {
     coordinates[0] = result->lat;
     coordinates[1] = result->lon;
@@ -164,7 +165,6 @@ int menu(double *coordinates, t_houses **list_houses, t_places **list_places) {
   case 2:
     if (handle_place_search(coordinates, *list_places))
       return EXIT_FAILURE;
-
     break;
   case 3:
     printf("Not handled yet!\n");
