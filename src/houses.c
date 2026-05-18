@@ -77,12 +77,11 @@ t_houses *load_houses_from_file(const char *file_name) {
   file = fopen(file_name, "r");
   if (!file)
     return NULL;
-  while (fscanf(file, " %99[^,],%d,%lf,%lf", tmp.st_name, &tmp.num, &tmp.lat,
-                &tmp.lon) == 4) {
+  while (fscanf(file, " %99[^,],%d,%lf,%lf", tmp.st_name, &tmp.num, &tmp.lat, &tmp.lon) == 4) {
     counter++;
     add_house_to_list(&list, tmp);
   }
-  printf("%d houses loaded\n", counter);
+  printf(S_GREEN"\t[ %d ] houses loaded\n"RESET, counter);
   fclose(file);
   return list;
 }
@@ -251,7 +250,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   }
 
 
-  char *buf = input_str(10);
+  char *buf = input_str();
   if (!buf) { free(names); return NULL; }
   int choice = atoi(buf);
   free(buf);
@@ -272,7 +271,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   printf("Number %d not found on \"%s\".\n", number, chosen);
   print_valid_numbers(list, chosen);
   printf("Enter a valid number: ");
-  char *nbuf = input_str(10);
+  char *nbuf = input_str();
   if (!nbuf)
     return NULL;
   int new_number = atoi(nbuf);

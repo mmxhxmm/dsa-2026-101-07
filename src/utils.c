@@ -1,13 +1,12 @@
 #include "../hdr/common.h"
-#define EARTH_RADIUS 6371.0
-#include <ctype.h>
+#include "../hdr/utils.h"
 
 /*
     @param:     maximum size of the string to read
     @def:       reads from stdin a string with the correct length
     @return:    char pointer to fisrt character of string
 */
-char *input_str(int max) {
+/* char *input_str(int max) {
   char *str = (char *)malloc((max + 1) * sizeof(char));
 
   if (str == NULL)
@@ -34,9 +33,24 @@ char *input_str(int max) {
 
   free(str);
   return NULL;
+}*/
+
+char  *input_str( void )
+{
+    char buffer[INPUT_SIZE];
+
+    if (!fgets(buffer, INPUT_SIZE, stdin))
+        return NULL;
+
+    size_t len = strlen(buffer);
+
+    if (len > 0 && buffer[len - 1] == '\n')
+        buffer[len - 1] = '\0';
+
+    return strdup(buffer);
 }
 
-int input_int() {
+/* int input_int() {
   char *temp = input_str(10);
   int value;
 
@@ -46,7 +60,56 @@ int input_int() {
   value = atoi(temp);
   free(temp);
 
+  printf("LLEGO ACA 1.a\n");
   return value;
+} */
+
+int input_int(void)
+{
+    char *str = input_str();
+    if (!str)
+        return -1;
+
+    char *p = str;
+
+    if (*p == '\0') {
+        free(str);
+        return -1;
+    }
+
+    if (*p == '\0') {
+        free(str);
+        return -1;
+    }
+
+    while (*p)
+    {
+        if (*p < '0' || *p > '9')
+        {
+            free(str);
+            return -1;
+        }
+        p++;
+    }
+
+    int value = atoi(str);
+    free(str);
+    return value;
+}
+
+int input_int_range(int min, int max)
+{
+    int value;
+
+    while (1)
+    {
+        value = input_int();
+
+        if (value >= min && value <= max)
+            return value;
+
+        printf("Invalid option (%d-%d). Try again: ", min, max);
+    }
 }
 
 /*

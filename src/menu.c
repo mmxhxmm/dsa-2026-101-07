@@ -3,7 +3,6 @@
 #include "../hdr/places.h"
 #include "../hdr/streets.h"
 #include "../hdr/utils.h"
-#include <stdlib.h>
 
 void origin_info(t_house o) {
   printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);
@@ -29,9 +28,7 @@ t_places *init_list_places(const char *map_name) {
 
   if (!map_name)
     return NULL;
-  printf("./maps/%s/places.txt\n", map_name);
   snprintf(file_path, sizeof(file_path), "./maps/%s/places.txt", map_name);
-
   return load_places_from_file(file_path);
 }
 
@@ -40,7 +37,6 @@ t_streets *init_list_streets(const char *map_name) {
 
   if (!map_name)
     return NULL;
-  printf("./maps/%s/streets.txt\n", map_name);
   snprintf(file_path, sizeof(file_path), "./maps/%s/streets.txt", map_name);
 
   return load_streets_from_file(file_path);
@@ -60,11 +56,11 @@ int handle_address_search(double *coordinates, t_houses *list) {
 
   printf("\nEnter street name (e.g. Carrer de Roc Boronat): ");
 
-  char *name = input_str(50);
+  char *name = input_str();
 
   while (!name) {
     printf("\nIntroduce name again: ");
-    name = input_str(50);
+    name = input_str();
   }
 
   printf("Enter street number: ");
@@ -84,7 +80,7 @@ int handle_address_search(double *coordinates, t_houses *list) {
     printf("Invalid number for \"%s\".\n", name);
     print_valid_numbers(list, name);
     printf("Enter a valid number: ");
-    char *nbuf = input_str(10);
+    char *nbuf = input_str();
 
     if (nbuf) {
       int new_num = atoi(nbuf);
@@ -116,11 +112,11 @@ int handle_place_search(double *coordinates, t_places *list) {
 
   printf("\nEnter place name (e.g. L'Illa Diagonal): ");
 
-  char *name_place = input_str(50);
+  char *name_place = input_str();
 
   while (!name_place) {
     printf("\nIntroduce name again: ");
-    name_place = input_str(50);
+    name_place = input_str();
   }
 
   t_place *result = search_place(list, name_place);
@@ -147,37 +143,39 @@ int handle_place_search(double *coordinates, t_places *list) {
 **   3 → coordinate search (not implemented yet)
 ** Returns the found t_house, or an empty one if nothing matched.
 */
-int menu(double *coordinates, t_houses **list_houses, t_places **list_places) {
-  printf(
-      "\nMap loaded. Where are you? Address (1), Place (2), Coordinate (3): ");
-  int option = input_int();
+int location_menu(double *coordinates, t_houses **houses, t_places **places)
+{
+    printf("Where are you? Address (1), Place (2), Coordinate (3): ");
+    int option = input_int_range(1, 3);
 
-  while (option < 1 || option > 3) {
-    printf("\nInvalid Option! Enter again: ");
-    option = input_int();
-  }
+    switch (option)
+    {
+        case 1:
+            if (handle_address_search(coordinates, *houses))
+                return EXIT_FAILURE;
+            break;
 
-  switch (option) {
-  case 1:
-    if (handle_address_search(coordinates, *list_houses))
-      return EXIT_FAILURE;
-    break;
-  case 2:
-    if (handle_place_search(coordinates, *list_places))
-      return EXIT_FAILURE;
-    break;
-  case 3:
-    printf("Not handled yet!\n");
-    return EXIT_FAILURE;
-    // handle_place_search(list);
-  }
-  return EXIT_SUCCESS;
+        case 2:
+            if (handle_place_search(coordinates, *places)) {
+              printf("MALL\n");
+                return EXIT_FAILURE;
+            }
+            break;
+
+        case 3:
+            printf("Not implemented yet\n");
+            return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
 
 int action_menu() {
+  printf(S_CYAN"\n\t------------------ MENU ------------------\n");
   printf("\t1.\tORIGIN\n");
   printf("\t2.\tDESTINATION\t(only if you have your origin)\n");
-  printf("\t3.\tEXIT\n\n");
-  printf("Enter an option: ");
+  printf("\t3.\tFIND ROUTE\n");
+  printf("\t4.\tEXIT\n\n");
+  printf("\tEnter an option: ");
   return (input_int());
 }

@@ -39,7 +39,7 @@ t_places *load_places_from_file(const char *file_name) {
     counter++;
     add_place_to_list(&list, tmp);
   }
-  printf("%d places loaded\n", counter);
+  printf(S_GREEN"\t[ %d ] places loaded\n"RESET, counter);
   fclose(file);
   return list;
 }
@@ -142,7 +142,7 @@ t_place *suggest_similar_places(t_places *list, const char *name) {
   else
     printf("Choose (enter number 1-%d): ", show);
 
-  char *buf = input_str(10);
+  char *buf = input_str();
   if (!buf) {
     free(names);
     return NULL;
