@@ -1,8 +1,8 @@
-#include "../hdr/common.h"
 #include "../hdr/houses.h"
+#include "../hdr/common.h"
 #include "../hdr/places.h"
-#include "../hdr/streets.h"
 #include "../hdr/street_hash.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
 
 /*

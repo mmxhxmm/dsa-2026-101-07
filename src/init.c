@@ -1,10 +1,10 @@
+#include "../hdr/init.h"
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
-#include "../hdr/places.h"
-#include "../hdr/streets.h"
-#include "../hdr/street_hash.h"
-#include "../hdr/init.h"
 #include "../hdr/menu.h"
+#include "../hdr/places.h"
+#include "../hdr/street_hash.h"
+#include "../hdr/streets.h"
 
 /*
 ** Builds the file path to the houses.txt file for the given map name,
@@ -41,12 +41,13 @@ t_streets *init_list_streets(const char *map_name) {
 }
 
 t_hash_map *init_hash_map(int size) {
+
   t_hash_map *map = (t_hash_map *)malloc(sizeof(t_hash_map));
+
   if (!map)
     return NULL;
 
   map->size = size;
-  // Reservamos memoria para el array de punteros (buckets)
   map->buckets = (t_hash_node **)calloc(size, sizeof(t_hash_node *));
 
   if (!map->buckets) {
@@ -81,24 +82,19 @@ int init_streets(char *map_name, t_streets **streets) {
   return EXIT_SUCCESS;
 }
 
-int init_streets_hash(t_hash_map **street_hash_map, t_streets *street_list)
-{
-    t_hash_map *map = init_hash_map(TABLE_SIZE);
+int init_streets_hash(t_hash_map **street_hash_map, t_streets *street_list) {
+  t_hash_map *map = init_hash_map(TABLE_SIZE);
+  if (!map)
+    return EXIT_FAILURE;
 
-    if (!map)
-        return EXIT_FAILURE;
-        
-    t_streets *curr = street_list;
-    while (curr != NULL)
-    {
-        t_street *real_street_ptr = &(curr->street);
+  t_streets *curr = street_list;
+  while (curr != NULL) {
+    insert_intersection(map, curr->street.from_id, &(curr->street));
+    curr = curr->next;
+  }
+  *street_hash_map = map;
 
-        insert_intersection(map, curr->street.from_id, real_street_ptr);
-        curr = curr->next;
-    }
-    *street_hash_map = map;
-    
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 int init_all(char *map_name, t_houses **houses, t_places **places,
@@ -132,6 +128,8 @@ int init_all(char *map_name, t_houses **houses, t_places **places,
     free_streets(*streets);
     return EXIT_FAILURE; // CORREGIDO: Retorno de error obligatorio añadido aquí
   }
+
+  print_hash_map(*streets_hash);
 
   return EXIT_SUCCESS;
 }

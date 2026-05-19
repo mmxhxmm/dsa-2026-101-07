@@ -10,7 +10,6 @@ typedef struct s_connect_street {
       *next; // Siguiente calle conectada a esta misma esquina
 } t_connected_street;
 
-
 // 2. Nodo de la Tabla Hash (Maneja las intersecciones y colisiones)
 typedef struct s_hash_node {
   long long
@@ -29,6 +28,9 @@ typedef struct {
 void insert_intersection(t_hash_map *map, long long inter_id,
                          t_street *street_ptr);
 void find_connected_streets_map(t_hash_map *map, t_street *current_street);
-void print_connections_for_intersection(t_hash_map *map, long long inter_id, long long curr_street_from, long long curr_street_to);
-
+void print_connections_for_intersection(t_hash_map *map, long long inter_id,
+                                        long long curr_street_from,
+                                        long long curr_street_to);
+/* D E L E T E */
+void print_hash_map(t_hash_map *map);
 #endif

@@ -2,10 +2,9 @@
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
 #include "../hdr/places.h"
-#include "../hdr/streets.h"
 #include "../hdr/street_hash.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
-
 
 void origin_info(t_house o) {
   printf("\n [ORIGIN]:\t%s, %d, %f, %f\n\n", o.st_name, o.num, o.lon, o.lat);

@@ -1,11 +1,10 @@
-#include "../hdr/menu.h"
+#include "../hdr/places.h"
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
-#include "../hdr/places.h"
-#include "../hdr/streets.h"
+#include "../hdr/menu.h"
 #include "../hdr/street_hash.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
-
 
 t_places *create_place_element(t_place place_data) {
   t_places *new_el = malloc(sizeof(t_places));

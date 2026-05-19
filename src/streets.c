@@ -1,8 +1,8 @@
-#include "../hdr/menu.h"
+#include "../hdr/streets.h"
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
+#include "../hdr/menu.h"
 #include "../hdr/places.h"
-#include "../hdr/streets.h"
 #include "../hdr/street_hash.h"
 #include "../hdr/utils.h"
 
@@ -51,17 +51,7 @@ t_streets *load_streets_from_file(const char *file_name) {
                     &tmp.from_id, &tmp.from_lat, &tmp.from_lon, &tmp.to_id,
                     &tmp.to_lat, &tmp.to_lon, tmp.st_name);
 
-    /*
-       sscanf returns 7 only if the street name was read.
-       Lines without a name will return 6, so skip them.
-    */
-    if (fields != 7)
-      continue;
-
-    /*
-       Optional: skip names that are only spaces.
-    */
-    if (tmp.st_name[0] == '\0')
+    if (fields != 7 || tmp.st_name[0] == '\0')
       continue;
 
     add_street_to_list(&list, tmp);

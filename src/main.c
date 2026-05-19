@@ -1,11 +1,11 @@
-#include "../hdr/houses.h"
-#include "../hdr/menu.h"
 #include "../hdr/common.h"
+#include "../hdr/houses.h"
+#include "../hdr/init.h"
+#include "../hdr/menu.h"
 #include "../hdr/origin.h"
 #include "../hdr/places.h"
-#include "../hdr/streets.h"
 #include "../hdr/street_hash.h"
-#include "../hdr/init.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
 
 int main() {
