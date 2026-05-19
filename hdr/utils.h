@@ -2,7 +2,9 @@
 #define UTILS_H
 
 #define EARTH_RADIUS 6371.0
-#define INPUT_SIZE 100
+#define INPUT_SIZE 10077
+
+#include "../hdr/common.h"
 
 int hash_function(long long intersection_id, int table_size);
 char *input_str(void);

@@ -129,7 +129,7 @@ int init_all(char *map_name, t_houses **houses, t_places **places,
     return EXIT_FAILURE; // CORREGIDO: Retorno de error obligatorio añadido aquí
   }
 
-  print_hash_map(*streets_hash);
+  // print_hash_map(*streets_hash); // B O R R A R
 
   return EXIT_SUCCESS;
 }
