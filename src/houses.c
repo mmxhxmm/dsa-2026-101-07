@@ -1,4 +1,8 @@
 #include "../hdr/common.h"
+#include "../hdr/houses.h"
+#include "../hdr/places.h"
+#include "../hdr/streets.h"
+#include "../hdr/street_hash.h"
 #include "../hdr/utils.h"
 
 /*
@@ -15,7 +19,7 @@ int compare_streets(const char *search, const char *list_name) {
   if (strcasecmp(search, list_name) == 0)
     return 1;
 
-  const char  *list_rest = strchr(list_name, ' ');
+  const char *list_rest = strchr(list_name, ' ');
   if (!list_rest)
     return 0;
   list_rest++;
@@ -77,11 +81,12 @@ t_houses *load_houses_from_file(const char *file_name) {
   file = fopen(file_name, "r");
   if (!file)
     return NULL;
-  while (fscanf(file, " %99[^,],%d,%lf,%lf", tmp.st_name, &tmp.num, &tmp.lat, &tmp.lon) == 4) {
+  while (fscanf(file, " %99[^,],%d,%lf,%lf", tmp.st_name, &tmp.num, &tmp.lat,
+                &tmp.lon) == 4) {
     counter++;
     add_house_to_list(&list, tmp);
   }
-  printf(S_GREEN"\t[ %d ] houses loaded\n"RESET, counter);
+  printf(S_GREEN "\t[ %d ] houses loaded\n" RESET, counter);
   fclose(file);
   return list;
 }
@@ -131,24 +136,36 @@ void print_valid_numbers(t_houses *list, const char *name) {
   }
   printf("\n");
 }
-// For testing only 
+// For testing only
 static int core_starts_with(const char *candidate, const char *input) {
   int len = strlen(input);
-  if (len == 0) return 0;
+  if (len == 0)
+    return 0;
   return strncasecmp(candidate, input, len) == 0;
 }
-// Testing if it's the correct way 
+// Testing if it's the correct way
 static const char *skip_prefix(const char *s) {
-  const char *prefixes[] = {
-    "carrer de la ", "carrer de les ", "carrer de l'",
-    "carrer del ", "carrer de ", "carrer ",
-    "avinguda de la ", "avinguda de ", "avinguda ",
-    "passeig de ", "passatge de ",
-    "c. de la ", "c. de les ", "c. del ", "c. de ", "c. ",
-    "av. de ", "av. ",
-    "pg. de ", "pg. ",
-    NULL
-  };
+  const char *prefixes[] = {"carrer de la ",
+                            "carrer de les ",
+                            "carrer de l'",
+                            "carrer del ",
+                            "carrer de ",
+                            "carrer ",
+                            "avinguda de la ",
+                            "avinguda de ",
+                            "avinguda ",
+                            "passeig de ",
+                            "passatge de ",
+                            "c. de la ",
+                            "c. de les ",
+                            "c. del ",
+                            "c. de ",
+                            "c. ",
+                            "av. de ",
+                            "av. ",
+                            "pg. de ",
+                            "pg. ",
+                            NULL};
   for (int i = 0; prefixes[i]; i++) {
     int len = strlen(prefixes[i]);
     if (strncasecmp(s, prefixes[i], len) == 0)
@@ -173,7 +190,7 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   int count = 0;
   char **names = malloc(capacity * sizeof(char *));
   if (!name)
-      return NULL;
+    return NULL;
 
   t_houses *cur = list;
   while (cur) {
@@ -187,11 +204,11 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
       if (count >= capacity) {
         capacity *= 2;
         char **tmp = realloc(names, capacity * sizeof(char *));
-	if (!tmp) {
-	    free(names);
-	    return NULL;
-	}
-	names = tmp;
+        if (!tmp) {
+          free(names);
+          return NULL;
+        }
+        names = tmp;
       }
       names[count++] = cur->house.st_name;
     }
@@ -204,7 +221,8 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     char *key = names[i];
     int key_dist = lev_distance(name_core, skip_prefix(key));
     int j = i - 1;
-    while (j >= 0 && lev_distance(name_core, skip_prefix(names[j])) > key_dist) {
+    while (j >= 0 &&
+           lev_distance(name_core, skip_prefix(names[j])) > key_dist) {
       names[j + 1] = names[j];
       j--;
     }
@@ -224,14 +242,14 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
     threshold = 4;
 
   char *filtered[5];
-    int show = 0;
-    for (int i = 0; i < count && show < 5; i++) {
-      const char *cand_core = skip_prefix(names[i]);
-      int dist = lev_distance(name_core, cand_core);
-      int starts = core_starts_with(cand_core, name_core);
-      if (dist <= threshold || starts)
-        filtered[show++] = names[i];
-    }
+  int show = 0;
+  for (int i = 0; i < count && show < 5; i++) {
+    const char *cand_core = skip_prefix(names[i]);
+    int dist = lev_distance(name_core, cand_core);
+    int starts = core_starts_with(cand_core, name_core);
+    if (dist <= threshold || starts)
+      filtered[show++] = names[i];
+  }
 
   if (show == 0) {
     printf("Street \"%s\" not found and no similar streets found.\n", name);
@@ -243,19 +261,24 @@ t_house *suggest_similar_streets(t_houses *list, const char *name, int number) {
   for (int i = 0; i < show; i++)
     printf("\033[96m  %d. %s\n", i + 1, filtered[i]);
   printf("  0. Cancel\n");
-  if(show == 1){
-      printf("Choose (enter number 1): ");
-  }else{
-      printf("Choose (enter number 1-%d): ", show);
+  if (show == 1) {
+    printf("Choose (enter number 1): ");
+  } else {
+    printf("Choose (enter number 1-%d): ", show);
   }
 
-
   char *buf = input_str();
-  if (!buf) { free(names); return NULL; }
+  if (!buf) {
+    free(names);
+    return NULL;
+  }
   int choice = atoi(buf);
   free(buf);
 
-  if (choice <= 0 || choice > show) { free(names); return NULL; }
+  if (choice <= 0 || choice > show) {
+    free(names);
+    return NULL;
+  }
 
   char chosen[100];
   strncpy(chosen, filtered[choice - 1], sizeof(chosen) - 1);

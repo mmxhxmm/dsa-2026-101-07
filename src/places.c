@@ -1,6 +1,11 @@
+#include "../hdr/menu.h"
 #include "../hdr/common.h"
+#include "../hdr/houses.h"
+#include "../hdr/places.h"
+#include "../hdr/streets.h"
+#include "../hdr/street_hash.h"
 #include "../hdr/utils.h"
-#include <string.h>
+
 
 t_places *create_place_element(t_place place_data) {
   t_places *new_el = malloc(sizeof(t_places));
@@ -39,7 +44,7 @@ t_places *load_places_from_file(const char *file_name) {
     counter++;
     add_place_to_list(&list, tmp);
   }
-  printf(S_GREEN"\t[ %d ] places loaded\n"RESET, counter);
+  printf(S_GREEN "\t[ %d ] places loaded\n" RESET, counter);
   fclose(file);
   return list;
 }
@@ -55,11 +60,11 @@ t_place *search_place(t_places *list, const char *name) {
   return NULL;
 }
 /* Adding suggest similar places
-* Firstky, it loads all the places name available
-* Checck the levenshtien distance(same as the houses one)
-* Apply multiple threshold scales to teh input's len
-* Filter the options and show the most similar one
-*/
+ * Firstky, it loads all the places name available
+ * Checck the levenshtien distance(same as the houses one)
+ * Apply multiple threshold scales to teh input's len
+ * Filter the options and show the most similar one
+ */
 t_place *suggest_similar_places(t_places *list, const char *name) {
   // collect unique place names
   int capacity = 64;
@@ -115,13 +120,13 @@ t_place *suggest_similar_places(t_places *list, const char *name) {
   else
     threshold = 4;
 
-  // filter: levenshtein within threshold OR starts-with (min 3 chars, reasonable length diff)
+  // filter: levenshtein within threshold OR starts-with (min 3 chars,
+  // reasonable length diff)
   char *filtered[5];
   int show = 0;
   for (int i = 0; i < count && show < 5; i++) {
     int dist = lev_distance(name, names[i]);
-    int starts = (name_len >= 3 &&
-                  strncasecmp(names[i], name, name_len) == 0 &&
+    int starts = (name_len >= 3 && strncasecmp(names[i], name, name_len) == 0 &&
                   (int)strlen(names[i]) - name_len <= 8);
     if (dist <= threshold || starts)
       filtered[show++] = names[i];

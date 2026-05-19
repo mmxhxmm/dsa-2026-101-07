@@ -1,115 +1,72 @@
+#include "../hdr/menu.h"
 #include "../hdr/common.h"
+#include "../hdr/houses.h"
+#include "../hdr/places.h"
+#include "../hdr/streets.h"
+#include "../hdr/street_hash.h"
 #include "../hdr/utils.h"
 
-/*
-    @param:     maximum size of the string to read
-    @def:       reads from stdin a string with the correct length
-    @return:    char pointer to fisrt character of string
-*/
-/* char *input_str(int max) {
-  char *str = (char *)malloc((max + 1) * sizeof(char));
 
-  if (str == NULL)
+/* create an identifier for our hash map array */
+int hash_function(long long intersection_id, int table_size) {
+  return (int)(intersection_id % table_size);
+}
+
+char *input_str(void) {
+  char buffer[INPUT_SIZE];
+
+  if (!fgets(buffer, INPUT_SIZE, stdin))
     return NULL;
 
-  if (fgets(str, max + 1, stdin)) {
-    char *p = strchr(str, '\n'); // Find the 1rst occurrence of \n to see if the
-                                 // string fits in the buffer
+  size_t len = strlen(buffer);
 
-    if (p != NULL) {
-      *p = '\0';
-      return str;
-    } else {
-      printf("Error: too long (%d)\n", max);
+  if (len > 0 && buffer[len - 1] == '\n')
+    buffer[len - 1] = '\0';
 
-      int c;
-      while ((c = getchar()) != '\n' && c != EOF)
-        ;
-
-      free(str);
-      return NULL;
-    }
-  }
-
-  free(str);
-  return NULL;
-}*/
-
-char  *input_str( void )
-{
-    char buffer[INPUT_SIZE];
-
-    if (!fgets(buffer, INPUT_SIZE, stdin))
-        return NULL;
-
-    size_t len = strlen(buffer);
-
-    if (len > 0 && buffer[len - 1] == '\n')
-        buffer[len - 1] = '\0';
-
-    return strdup(buffer);
+  return strdup(buffer);
 }
 
-/* int input_int() {
-  char *temp = input_str(10);
-  int value;
-
-  if (temp == NULL)
+int input_int(void) {
+  char *str = input_str();
+  if (!str)
     return -1;
 
-  value = atoi(temp);
-  free(temp);
+  char *p = str;
 
-  printf("LLEGO ACA 1.a\n");
-  return value;
-} */
-
-int input_int(void)
-{
-    char *str = input_str();
-    if (!str)
-        return -1;
-
-    char *p = str;
-
-    if (*p == '\0') {
-        free(str);
-        return -1;
-    }
-
-    if (*p == '\0') {
-        free(str);
-        return -1;
-    }
-
-    while (*p)
-    {
-        if (*p < '0' || *p > '9')
-        {
-            free(str);
-            return -1;
-        }
-        p++;
-    }
-
-    int value = atoi(str);
+  if (*p == '\0') {
     free(str);
-    return value;
+    return -1;
+  }
+
+  if (*p == '\0') {
+    free(str);
+    return -1;
+  }
+
+  while (*p) {
+    if (*p < '0' || *p > '9') {
+      free(str);
+      return -1;
+    }
+    p++;
+  }
+
+  int value = atoi(str);
+  free(str);
+  return value;
 }
 
-int input_int_range(int min, int max)
-{
-    int value;
+int input_int_range(int min, int max) {
+  int value;
 
-    while (1)
-    {
-        value = input_int();
+  while (1) {
+    value = input_int();
 
-        if (value >= min && value <= max)
-            return value;
+    if (value >= min && value <= max)
+      return value;
 
-        printf("Invalid option (%d-%d). Try again: ", min, max);
-    }
+    printf("Invalid option (%d-%d). Try again: ", min, max);
+  }
 }
 
 /*
@@ -144,61 +101,60 @@ int lev_distance(const char *a, const char *b) {
   return matrix[la][lb];
 }
 
-
-//Computes the midpoint between 2 coordinates
-//It uses 2 struct-variables called "position" as inputs, and returns a "position" struct, which would be the mid-point.
+// Computes the midpoint between 2 coordinates
+// It uses 2 struct-variables called "position" as inputs, and returns a
+// "position" struct, which would be the mid-point.
 
 double toDegrees(double radians) {
-    double pi=acos(-1);
-    return radians * (180.0 / pi);
+  double pi = acos(-1);
+  return radians * (180.0 / pi);
 }
 
 double toRadians(double degree) {
-    double pi=acos(-1);
-    return degree * (pi / 180.0);
+  double pi = acos(-1);
+  return degree * (pi / 180.0);
 }
-
 
 Position midpoint(Position a, Position b) {
-    double lat1 = toRadians(a.lat);
-    double lon1 = toRadians(a.lon);
-    double lat2 = toRadians(b.lat);
-    double lon2 = toRadians(b.lon);
+  double lat1 = toRadians(a.lat);
+  double lon1 = toRadians(a.lon);
+  double lat2 = toRadians(b.lat);
+  double lon2 = toRadians(b.lon);
 
-    double x1 = cos(lat1) * cos(lon1);
-    double y1 = cos(lat1) * sin(lon1);
-    double z1 = sin(lat1);
+  double x1 = cos(lat1) * cos(lon1);
+  double y1 = cos(lat1) * sin(lon1);
+  double z1 = sin(lat1);
 
-    double x2 = cos(lat2) * cos(lon2);
-    double y2 = cos(lat2) * sin(lon2);
-    double z2 = sin(lat2);
+  double x2 = cos(lat2) * cos(lon2);
+  double y2 = cos(lat2) * sin(lon2);
+  double z2 = sin(lat2);
 
-    double x = (x1 + x2) / 2.0;
-    double y = (y1 + y2) / 2.0;
-    double z = (z1 + z2) / 2.0;
+  double x = (x1 + x2) / 2.0;
+  double y = (y1 + y2) / 2.0;
+  double z = (z1 + z2) / 2.0;
 
-    double lon = atan2(y, x);
-    double hyp = sqrt(x * x + y * y);
-    double lat = atan2(z, hyp);
+  double lon = atan2(y, x);
+  double hyp = sqrt(x * x + y * y);
+  double lat = atan2(z, hyp);
 
-    Position mid;
-    mid.lat = toDegrees(lat);
-    mid.lon = toDegrees(lon);
-    return mid;
+  Position mid;
+  mid.lat = toDegrees(lat);
+  mid.lon = toDegrees(lon);
+  return mid;
 }
 
-//Computes the distance between 2 positions
+// Computes the distance between 2 positions
 
 double haversine(Position posA, Position posB) {
-    double lat1 = toRadians(posA.lat);
-    double lon1 = toRadians(posA.lon);
-    double lat2 = toRadians(posB.lat);
-    double lon2 = toRadians(posB.lon);
+  double lat1 = toRadians(posA.lat);
+  double lon1 = toRadians(posA.lon);
+  double lat2 = toRadians(posB.lat);
+  double lon2 = toRadians(posB.lon);
 
-    double dLat = lat2 - lat1;
-    double dLon = lon2 - lon1;
-    double a = pow(sin(dLat / 2), 2) +
-    cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return EARTH_RADIUS * c;
+  double dLat = lat2 - lat1;
+  double dLon = lon2 - lon1;
+  double a =
+      pow(sin(dLat / 2), 2) + cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+  return EARTH_RADIUS * c;
 }

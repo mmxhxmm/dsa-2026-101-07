@@ -1,7 +1,10 @@
+#include "../hdr/menu.h"
 #include "../hdr/common.h"
+#include "../hdr/houses.h"
+#include "../hdr/places.h"
+#include "../hdr/streets.h"
+#include "../hdr/street_hash.h"
 #include "../hdr/utils.h"
-#include <string.h>
-
 
 t_streets *create_street_element(t_street street_data) {
   t_streets *new_el = malloc(sizeof(t_streets));
@@ -35,110 +38,107 @@ t_streets *load_streets_from_file(const char *file_name) {
 
   file = fopen(file_name, "r");
 
-  if (!file){
+  if (!file) {
     return NULL;
   }
 
-    while (fgets(line, sizeof(line), file))
-    {
-        int fields;
+  while (fgets(line, sizeof(line), file)) {
+    int fields;
 
-        tmp.st_name[0] = '\0';
+    tmp.st_name[0] = '\0';
 
-        fields = sscanf(line,
-            "%lld,%lf,%lf,%lld,%lf,%lf,%*f,%99[^\n]",
-            &tmp.from_id,
-            &tmp.from_lat,
-            &tmp.from_lon,
-            &tmp.to_id,
-            &tmp.to_lat,
-            &tmp.to_lon,
-            tmp.st_name
-        );
+    fields = sscanf(line, "%lld,%lf,%lf,%lld,%lf,%lf,%*f,%99[^\n]",
+                    &tmp.from_id, &tmp.from_lat, &tmp.from_lon, &tmp.to_id,
+                    &tmp.to_lat, &tmp.to_lon, tmp.st_name);
 
-        /*
-           sscanf returns 7 only if the street name was read.
-           Lines without a name will return 6, so skip them.
-        */
-        if (fields != 7)
-            continue;
+    /*
+       sscanf returns 7 only if the street name was read.
+       Lines without a name will return 6, so skip them.
+    */
+    if (fields != 7)
+      continue;
 
-        /*
-           Optional: skip names that are only spaces.
-        */
-        if (tmp.st_name[0] == '\0')
-            continue;
+    /*
+       Optional: skip names that are only spaces.
+    */
+    if (tmp.st_name[0] == '\0')
+      continue;
 
-        add_street_to_list(&list, tmp);
-        counter++;
-    }
+    add_street_to_list(&list, tmp);
+    counter++;
+  }
 
-  printf(S_GREEN"\t[ %d ] streets loaded\n"RESET, counter);
+  printf(S_GREEN "\t[ %d ] streets loaded\n" RESET, counter);
   fclose(file);
   return list;
 }
 
-t_streets	*closest_street(t_streets* list_streets, Position user_position) {
-  //We will use "current" to walk through  the linked list
-  t_streets	*current_str=list_streets;
-  //We will save the closes street here
-  t_streets	*closest_str= current_str;
+t_streets *closest_street(t_streets *list_streets, Position user_position) {
+  // We will use "current" to walk through  the linked list
+  t_streets *current_str = list_streets;
+  // We will save the closes street here
+  t_streets *closest_str = current_str;
 
-  if(!closest_str)
+  if (!closest_str)
     return NULL;
 
-  //Dummy value to indicate "Not valid"
+  // Dummy value to indicate "Not valid"
   double closest_distance = -1;
 
-  //Computes the mid-point of every treet, and applies harversine function to find the closest one to the user's position
-  while(current_str!=NULL) {
-    Position	from_position = {current_str->street.from_lat, current_str->street.from_lon};
-    Position	to_position = {current_str->street.to_lat, current_str->street.to_lon};
-    Position	mid_point= midpoint(from_position, to_position);
-    double	current_distance=haversine(user_position, mid_point);
+  // Computes the mid-point of every treet, and applies harversine function to
+  // find the closest one to the user's position
+  while (current_str != NULL) {
+    Position from_position = {current_str->street.from_lat,
+                              current_str->street.from_lon};
+    Position to_position = {current_str->street.to_lat,
+                            current_str->street.to_lon};
+    Position mid_point = midpoint(from_position, to_position);
+    double current_distance = haversine(user_position, mid_point);
 
-    if(closest_distance == -1 || current_distance < closest_distance) {
-      closest_distance=current_distance;
-      closest_str=current_str;
+    if (closest_distance == -1 || current_distance < closest_distance) {
+      closest_distance = current_distance;
+      closest_str = current_str;
     }
 
-    current_str =current_str->next;
+    current_str = current_str->next;
   }
 
   return closest_str;
 }
 
-//Function to find all the streets connected to the closest one, and return them as a new Linked list
-//Notice that connected means that the end-point of the closest-street is the start-point of the connected-street
-void	find_connected_streets_segment(t_streets* closest_str, t_streets* head, t_streets **connected_streets_to_segment)
-{
+// Function to find all the streets connected to the closest one, and return
+// them as a new Linked list Notice that connected means that the end-point of
+// the closest-street is the start-point of the connected-street
+void find_connected_streets_segment(t_streets *closest_str, t_streets *head,
+                                    t_streets **connected_streets_to_segment) {
   if (head == NULL) {
     printf("\nHead is NULL");
-    return ;
+    return;
   }
 
   if (closest_str == NULL) {
     printf("\nClosest_str is NULL");
-    return ;
+    return;
   }
 
-  t_streets	*current = head;
+  t_streets *current = head;
 
-  while(current)
-  {
-    t_street	current_data = current->street;
+  while (current) {
+    t_street current_data = current->street;
 
-    if((current_data.from_id == closest_str->street.to_id) || (current_data.to_id == closest_str->street.from_id)) {
-      int included=false;
+    if ((current_data.from_id == closest_str->street.to_id) ||
+        (current_data.to_id == closest_str->street.from_id)) {
+      int included = false;
       t_streets *current_for_included_nodes = *connected_streets_to_segment;
 
-      while(current_for_included_nodes != NULL) {
-        if(strcmp(current_for_included_nodes->street.st_name, current_data.st_name) == 0)
+      while (current_for_included_nodes != NULL) {
+        if (strcmp(current_for_included_nodes->street.st_name,
+                   current_data.st_name) == 0)
           included = true;
         current_for_included_nodes = current_for_included_nodes->next;
       }
 
-      if(included == false)
+      if (included == false)
         add_street_to_list(connected_streets_to_segment, current_data);
     }
 
@@ -146,16 +146,13 @@ void	find_connected_streets_segment(t_streets* closest_str, t_streets* head, t_s
   }
 }
 
-void	find_connected_streets(t_streets* closest_str, t_streets* head, t_streets **connected_streets) {
-  t_streets	*current = head;
+void find_connected_streets(t_streets *closest_str, t_streets *head,
+                            t_streets **connected_streets) {
+  t_streets *current = head;
 
-  while(current) {
-    if(strcmp(closest_str->street.st_name, current->street.st_name) == 0)
+  while (current) {
+    if (strcmp(closest_str->street.st_name, current->street.st_name) == 0)
       find_connected_streets_segment(current, head, connected_streets);
     current = current->next;
   }
 }
-
-
-
-
