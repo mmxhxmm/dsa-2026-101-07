@@ -76,20 +76,34 @@ static t_streets *reconstruct_path(t_queue_node *end) {
   return path;
 }
 
+/* ── Check if node is at destination ───────────────────────────────── */
+
+static int is_destination(long long node_id, t_streets *end_street) {
+  /* Walk ALL segments of the destination street and check both endpoints */
+  t_streets *cur = end_street;
+  while (cur) {
+    if (node_id == cur->street.from_id || node_id == cur->street.to_id)
+      return 1;
+    cur = cur->next;
+  }
+  return 0;
+}
+
 /* ── BFS ────────────────────────────────────────────────────────────── */
 
-t_streets *bfs(t_hash_map *map, t_streets *start_street, t_streets *end_street) {
+t_streets *bfs(t_hash_map *map, t_streets *start_street,
+               t_streets *end_street) {
   if (!map || !start_street || !end_street) return NULL;
 
-  long long    target   = end_street->street.from_id;
-  t_queue      q        = {NULL, NULL};
-  t_visited   *visited  = NULL;
-  t_queue_node *all     = NULL;
-  t_streets    *path    = NULL;
+  t_queue      q       = {NULL, NULL};
+  t_visited   *visited = NULL;
+  t_queue_node *all    = NULL;
+  t_streets    *path   = NULL;
 
+  /* Seed both endpoints of the starting segment */
   t_queue_node *s1 = create_node(start_street->street.from_id, NULL, NULL);
   t_queue_node *s2 = create_node(start_street->street.to_id,   NULL, NULL);
-  if (!s1 || !s2) { free(s1); free(s2); return NULL; }
+  if (!s1 || !s2) { free(s1); free(s2); free_visited(visited); return NULL; }
 
   enqueue(&q, s1);
   enqueue(&q, s2);
@@ -100,7 +114,8 @@ t_streets *bfs(t_hash_map *map, t_streets *start_street, t_streets *end_street) 
     t_queue_node *cur = dequeue(&q);
     cur->next = all; all = cur;
 
-    if (cur->node_id == target) {
+    /* Check against ALL nodes of the destination street */
+    if (is_destination(cur->node_id, end_street)) {
       path = reconstruct_path(cur);
       break;
     }
@@ -141,9 +156,9 @@ void print_path(t_streets *path) {
 
   printf(S_GREEN "\n\t--- Step-by-step directions ---\n" RESET);
 
-  t_streets *cur   = path;
+  t_streets *cur      = path;
   char       prev[100] = "";
-  int        step  = 1;
+  int        step     = 1;
 
   while (cur) {
     if (strcmp(cur->street.st_name, prev) != 0) {
@@ -153,6 +168,7 @@ void print_path(t_streets *path) {
         printf(S_CYAN "\t%d. Continue to %s\n" RESET, step, cur->street.st_name);
       step++;
       strncpy(prev, cur->street.st_name, sizeof(prev) - 1);
+      prev[sizeof(prev) - 1] = '\0';
     }
     cur = cur->next;
   }
