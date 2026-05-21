@@ -1,3 +1,4 @@
+#include "../hdr/bfs.h"
 #include "../hdr/common.h"
 #include "../hdr/houses.h"
 #include "../hdr/init.h"
@@ -11,16 +12,17 @@
 int main() {
   bool exit = false;
   int option;
-  t_houses *houses = NULL;
-  t_places *places = NULL;
-  t_streets *streets = NULL;
+  t_houses   *houses = NULL;
+  t_places   *places = NULL;
+  t_streets  *streets = NULL;
   t_hash_map *map = NULL;
-  double origin_coordinates[2] = {-1, -1};
+
+  double origin_coordinates[2]      = {-1, -1};
+  double destination_coordinates[2] = {-1, -1};
 
   printf(S_PURPLE "\n\t--------- WELCOME to NPM-MAPS ------------\n" RESET);
   printf("Enter map name (ex: xs_1, xl_1, ...): ");
   char *map_name = input_str();
-
   if (!map_name)
     return EXIT_FAILURE;
 
@@ -30,31 +32,35 @@ int main() {
   }
 
   while (!exit) {
-    option = action_menu(); // Chooses if introducing origin, destination, etc
-
+    option = action_menu();
     switch (option) {
     case 1:
       handle_origin(origin_coordinates, houses, places, streets, map);
       break;
-
     case 2:
       if (origin_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter origin\n" RESET);
+        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
       else
-        // handle_destination();
-        printf("Where do you want to go? Address (1), Place (2) or Coordinate "
-               "(3): (EXAMPLE)\n");
+        handle_destination(destination_coordinates, houses, places, streets, map);
       break;
-
     case 3:
-      printf(S_GREEN "Let's find the best route\n" RESET);
-      // find_route()
+      if (origin_coordinates[0] == -1)
+        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
+      else if (destination_coordinates[0] == -1)
+        printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
+      else {
+        Position op = {origin_coordinates[0],      origin_coordinates[1]};
+        Position dp = {destination_coordinates[0], destination_coordinates[1]};
+        t_streets *start = closest_street(streets, op);
+        t_streets *end   = closest_street(streets, dp);
+        t_streets *path  = bfs(map, start, end);
+        print_path(path);
+        if (path) free_streets(path);
+      }
       break;
-
     case 4:
       exit = true;
       break;
-
     default:
       printf("Invalid option\n");
       break;
@@ -66,4 +72,5 @@ int main() {
   free_places(places);
   free_streets(streets);
   free_hash_map(map);
+  return EXIT_SUCCESS;
 }

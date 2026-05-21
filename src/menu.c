@@ -144,3 +144,15 @@ int action_menu() {
   printf("\tEnter an option: ");
   return (input_int());
 }
+
+void handle_destination(double coords[2], t_houses *houses, t_places *places,
+                        t_streets *streets, t_hash_map *street_map) {
+  (void)streets;
+  (void)street_map;
+  printf("Where do you want to go? Address (1), Place (2) or Coordinate (3): ");
+  if (location_menu(coords, &houses, &places)) {
+    printf(S_RED "\tDestination not found\n" RESET);
+    return;
+  }
+  printf(S_GREEN "\tDestination set at (%.6f, %.6f)\n" RESET, coords[0], coords[1]);
+}
