@@ -53,7 +53,7 @@ int main() {
         Position dp = {destination_coordinates[0], destination_coordinates[1]};
         t_streets *start = closest_street(streets, op);
         t_streets *end   = closest_street(streets, dp);
-        t_streets *path  = bfs(map, start, end);
+        t_streets *path  = bfs(map, start, end, streets);
         print_path(path);
         if (path) free_streets(path);
       }

@@ -22,7 +22,7 @@ typedef struct s_visited {
   struct s_visited *next;
 } t_visited;
 
-t_streets *bfs(t_hash_map *map, t_streets *start_street, t_streets *end_street);
+t_streets *bfs(t_hash_map *map, t_streets *start_street, t_streets *end_street, t_streets *all_streets);
 void       print_path(t_streets *path);
 
 #endif

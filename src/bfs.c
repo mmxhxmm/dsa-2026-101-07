@@ -36,11 +36,11 @@ static int is_visited(t_visited *v, long long id) {
 }
 
 static void mark_visited(t_visited **v, long long id) {
-  t_visited *new = malloc(sizeof(t_visited));
-  if (!new) return;
-  new->node_id = id;
-  new->next    = *v;
-  *v           = new;
+  t_visited *n = malloc(sizeof(t_visited));
+  if (!n) return;
+  n->node_id = id;
+  n->next    = *v;
+  *v         = n;
 }
 
 static void free_visited(t_visited *v) {
@@ -76,24 +76,49 @@ static t_streets *reconstruct_path(t_queue_node *end) {
   return path;
 }
 
-/* ── Check if node is at destination ───────────────────────────────── */
+/* ── Is destination ─────────────────────────────────────────────────── */
 
 static int is_destination(long long node_id, t_streets *end_street) {
-  /* Walk ALL segments of the destination street and check both endpoints */
-  t_streets *cur = end_street;
-  while (cur) {
-    if (node_id == cur->street.from_id || node_id == cur->street.to_id)
-      return 1;
-    cur = cur->next;
+  return (node_id == end_street->street.from_id ||
+          node_id == end_street->street.to_id);
+}
+
+/* ── Get neighbours from streets list (both directions) ─────────────── */
+/*
+ * For a given node_id, find all streets where:
+ *   - from_id == node_id  (forward edge)
+ *   - to_id   == node_id  (backward edge, treat as bidirectional)
+ * and enqueue the other endpoint if not visited.
+ */
+static void enqueue_neighbours(long long node_id, t_queue_node *cur,
+                               t_streets *all_streets, t_visited **visited,
+                               t_queue *q) {
+  t_streets *s = all_streets;
+  while (s) {
+    long long nb = -1;
+    t_street *edge = &s->street;
+
+    if (edge->from_id == node_id)
+      nb = edge->to_id;
+    else if (edge->to_id == node_id)
+      nb = edge->from_id;
+
+    if (nb != -1 && !is_visited(*visited, nb)) {
+      mark_visited(visited, nb);
+      t_queue_node *next = create_node(nb, cur, edge);
+      if (next) enqueue(q, next);
+    }
+    s = s->next;
   }
-  return 0;
 }
 
 /* ── BFS ────────────────────────────────────────────────────────────── */
 
 t_streets *bfs(t_hash_map *map, t_streets *start_street,
-               t_streets *end_street) {
-  if (!map || !start_street || !end_street) return NULL;
+               t_streets *end_street, t_streets *all_streets) {
+  (void)map; /* streets list gives full bidirectional graph */
+
+  if (!start_street || !end_street || !all_streets) return NULL;
 
   t_queue      q       = {NULL, NULL};
   t_visited   *visited = NULL;
@@ -103,7 +128,7 @@ t_streets *bfs(t_hash_map *map, t_streets *start_street,
   /* Seed both endpoints of the starting segment */
   t_queue_node *s1 = create_node(start_street->street.from_id, NULL, NULL);
   t_queue_node *s2 = create_node(start_street->street.to_id,   NULL, NULL);
-  if (!s1 || !s2) { free(s1); free(s2); free_visited(visited); return NULL; }
+  if (!s1 || !s2) { free(s1); free(s2); return NULL; }
 
   enqueue(&q, s1);
   enqueue(&q, s2);
@@ -114,30 +139,12 @@ t_streets *bfs(t_hash_map *map, t_streets *start_street,
     t_queue_node *cur = dequeue(&q);
     cur->next = all; all = cur;
 
-    /* Check against ALL nodes of the destination street */
     if (is_destination(cur->node_id, end_street)) {
       path = reconstruct_path(cur);
       break;
     }
 
-    int bucket = (int)(cur->node_id % map->size);
-    t_hash_node *hnode = map->buckets[bucket];
-    while (hnode) {
-      if (hnode->intersection_id == cur->node_id) {
-        t_connected_street *conn = hnode->connections;
-        while (conn) {
-          long long nb = conn->street->to_id;
-          if (!is_visited(visited, nb)) {
-            mark_visited(&visited, nb);
-            t_queue_node *next = create_node(nb, cur, conn->street);
-            if (next) enqueue(&q, next);
-          }
-          conn = conn->next;
-        }
-        break;
-      }
-      hnode = hnode->next;
-    }
+    enqueue_neighbours(cur->node_id, cur, all_streets, &visited, &q);
   }
 
   while (q.head) { t_queue_node *r = dequeue(&q); r->next = all; all = r; }
