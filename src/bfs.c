@@ -1,6 +1,8 @@
 #include "../hdr/bfs.h"
 #include "../hdr/common.h"
 #include "../hdr/streets.h"
+#include "../hdr/init.h"
+#include "../hdr/utils.h"
 
 /* ── Visited helpers ────────────────────────────────────────────────── */
 
