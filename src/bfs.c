@@ -140,9 +140,13 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
     t_streets *last       = path_last(path);
     t_street  *current    = &last->street;
 
-    /* if current_street == toStreet: return path */
-    if (current->from_id == to_street->from_id &&
-        current->to_id   == to_street->to_id) {
+    /* if current_street == toStreet: return path
+     * Match if any intersection ID overlaps with destination street */
+    if (current->from_id == to_street->from_id ||
+        current->from_id == to_street->to_id   ||
+        current->to_id   == to_street->from_id ||
+        current->to_id   == to_street->to_id   ||
+        strcmp(current->st_name, to_street->st_name) == 0) {
       free_visited(visited);
       free_queue(&q);
       return path;
