@@ -12,10 +12,10 @@
 int main() {
   bool exit = false;
   int option;
-  t_houses   *houses = NULL;
-  t_places   *places = NULL;
+  t_houses   *houses  = NULL;
+  t_places   *places  = NULL;
   t_streets  *streets = NULL;
-  t_hash_map *map = NULL;
+  t_hash_map *map     = NULL;
 
   double origin_coordinates[2]      = {-1, -1};
   double destination_coordinates[2] = {-1, -1};
@@ -53,7 +53,8 @@ int main() {
         Position dp = {destination_coordinates[0], destination_coordinates[1]};
         t_streets *start = closest_street(streets, op);
         t_streets *end   = closest_street(streets, dp);
-        t_streets *path  = bfs(map, start, end, streets);
+        printf(S_GREEN "Finding route...\n" RESET);
+        t_streets *path = bfs(map, &start->street, &end->street, streets);
         print_path(path);
         if (path) free_streets(path);
       }
