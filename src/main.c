@@ -53,54 +53,8 @@ int main() {
     Position dp = {destination_coordinates[0], destination_coordinates[1]};
     t_streets *start = closest_street(streets, op);
     t_streets *end   = closest_street(streets, dp);
-
     printf(S_GREEN "Finding route...\n" RESET);
-
     t_streets *path = bfs(map, &start->street, &end->street, streets);
-
-    /* If no path, flip origin direction and retry */
-    if (!path) {
-      t_street flipped = start->street;
-      long long tmp    = flipped.from_id;
-      flipped.from_id  = flipped.to_id;
-      flipped.to_id    = tmp;
-      double tmp_lat   = flipped.from_lat;
-      double tmp_lon   = flipped.from_lon;
-      flipped.from_lat = flipped.to_lat;
-      flipped.from_lon = flipped.to_lon;
-      flipped.to_lat   = tmp_lat;
-      flipped.to_lon   = tmp_lon;
-      path = bfs(map, &flipped, &end->street, streets);
-    }
-
-    /* If still no path, flip destination direction and retry both */
-    if (!path) {
-      t_street flipped_end = end->street;
-      long long tmp        = flipped_end.from_id;
-      flipped_end.from_id  = flipped_end.to_id;
-      flipped_end.to_id    = tmp;
-      double tmp_lat       = flipped_end.from_lat;
-      double tmp_lon       = flipped_end.from_lon;
-      flipped_end.from_lat = flipped_end.to_lat;
-      flipped_end.from_lon = flipped_end.to_lon;
-      flipped_end.to_lat   = tmp_lat;
-      flipped_end.to_lon   = tmp_lon;
-      path = bfs(map, &start->street, &flipped_end, streets);
-      if (!path) {
-        t_street flipped_start = start->street;
-        tmp                    = flipped_start.from_id;
-        flipped_start.from_id  = flipped_start.to_id;
-        flipped_start.to_id    = tmp;
-        tmp_lat                = flipped_start.from_lat;
-        tmp_lon                = flipped_start.from_lon;
-        flipped_start.from_lat = flipped_start.to_lat;
-        flipped_start.from_lon = flipped_start.to_lon;
-        flipped_start.to_lat   = tmp_lat;
-        flipped_start.to_lon   = tmp_lon;
-        path = bfs(map, &flipped_start, &flipped_end, streets);
-      }
-    }
-
     print_path(path);
     if (path) free_streets(path);
   }

@@ -6,22 +6,22 @@
 
 /* ── Visited helpers ────────────────────────────────────────────────── */
 
-static int is_visited(t_visited *visited, const char *st_name) {
+static int is_visited(t_visited *visited, long long from_id, long long to_id) {
   while (visited) {
-    if (strcmp(visited->st_name, st_name) == 0)
+    if (visited->from_id == from_id && visited->to_id == to_id)
       return 1;
     visited = visited->next;
   }
   return 0;
 }
 
-static void mark_visited(t_visited **visited, const char *st_name) {
+static void mark_visited(t_visited **visited, long long from_id, long long to_id) {
   t_visited *v = malloc(sizeof(t_visited));
   if (!v) return;
-  strncpy(v->st_name, st_name, sizeof(v->st_name) - 1);
-  v->st_name[sizeof(v->st_name) - 1] = '\0';
-  v->next  = *visited;
-  *visited = v;
+  v->from_id = from_id;
+  v->to_id   = to_id;
+  v->next    = *visited;
+  *visited   = v;
 }
 
 static void free_visited(t_visited *visited) {
@@ -80,82 +80,40 @@ static t_streets *path_last(t_streets *path) {
   return path;
 }
 
-/* ── Get connected streets from the graph ───────────────────────────── */
-/*
- * Returns streets whose from_id matches current_street->to_id
- * (i.e. streets that start where current_street ends)
- */
-static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
+/* ── Get connected streets from both ends of current segment ─────────── */
+static t_streets *get_connected(t_street *current, t_streets *all_streets) {
   t_streets *connected = NULL;
-
-  /* Try forward: streets starting where current ends */
-  int idx = hash_function(current_street->to_id, map->size);
-  t_hash_node *node = map->buckets[idx];
-  while (node) {
-    if (node->intersection_id == current_street->to_id) {
-      t_connected_street *c = node->connections;
-      while (c) {
-        if (c->street->from_id == current_street->to_id &&
-            c->street->to_id   != current_street->from_id)
-          add_street_to_list(&connected, *c->street);
-        c = c->next;
-      }
-      break;
-    }
-    node = node->next;
+  t_streets *cur = all_streets;
+  while (cur) {
+    /* forward: next street starts where current ends */
+    if (cur->street.from_id == current->to_id &&
+        cur->street.to_id   != current->from_id)
+      add_street_to_list(&connected, cur->street);
+    /* reverse: next street ends where current ends (bidirectional support) */
+    else if (cur->street.to_id   == current->to_id &&
+             cur->street.from_id != current->from_id &&
+             cur->street.from_id != current->to_id)
+      add_street_to_list(&connected, cur->street);
+    cur = cur->next;
   }
-
-  /* If dead end: also try streets starting from current->from_id
-     (treats current intersection as reachable from both ends) */
-  if (!connected) {
-    idx = hash_function(current_street->from_id, map->size);
-    node = map->buckets[idx];
-    while (node) {
-      if (node->intersection_id == current_street->from_id) {
-        t_connected_street *c = node->connections;
-        while (c) {
-          if (c->street->from_id == current_street->from_id &&
-              c->street->to_id   != current_street->to_id)
-            add_street_to_list(&connected, *c->street);
-          c = c->next;
-        }
-        break;
-      }
-      node = node->next;
-    }
-  }
-
   return connected;
 }
 
-/* ── BFS — follows the pseudocode exactly ───────────────────────────── */
-/*
- * BFS(intersections_graph, fromStreet, toStreet):
- *   create an empty queue of street lists, Q
- *   create a street list [fromStreet], initial_path
- *   enqueue initial_path into Q
- *   create a street list [], visited
- *
- *   while Q is not empty:
- *     path = dequeue(Q)
- *     current_street = path[-1]
- *
- *     if current_street == toStreet: return path
- *
- *     if current_street not in visited:
- *       add current_street to visited
- *       for connected_street in graph[current_street.to_intersection]:
- *         if connected_street not in visited:
- *           new_path = path + [connected_street]
- *           enqueue new_path into Q
- *
- *   return NULL
- */
+/* ── Check if current street touches destination ────────────────────── */
+static int reached_destination(t_street *current, t_street *dest) {
+  return (current->from_id == dest->from_id && current->to_id == dest->to_id) ||
+         (current->from_id == dest->to_id   && current->to_id == dest->from_id) ||
+         (current->to_id   == dest->from_id) ||
+         (current->to_id   == dest->to_id)   ||
+         (current->from_id == dest->from_id) ||
+         (current->from_id == dest->to_id);
+}
 
+/* ── BFS ────────────────────────────────────────────────────────────── */
 t_streets *bfs(t_hash_map *map, t_street *from_street,
                t_street *to_street, t_streets *all_streets) {
-  (void)all_streets; // no longer needed, using hash map
-  if (!from_street || !to_street || !map) return NULL;
+  (void)map;
+  if (!from_street || !to_street || !all_streets) return NULL;
 
   t_queue    q       = {NULL, NULL};
   t_visited *visited = NULL;
@@ -172,36 +130,24 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
     t_streets *last    = path_last(path);
     t_street  *current = &last->street;
 
-   if (current->to_id   == to_street->from_id ||
-    current->to_id   == to_street->to_id   ||
-    current->from_id == to_street->from_id ||
-    current->from_id == to_street->to_id   ||
-    (current->from_id == to_street->from_id &&
-     current->to_id   == to_street->to_id)) {
-  if (!(current->from_id == to_street->from_id &&
-        current->to_id   == to_street->to_id))
-    add_street_to_list(&path, *to_street);
-  free_visited(visited);
-  free_queue(&q);
-  return path;
-}
-    /* ── CHANGED: visited tracked by segment ID, not name ── */
-    char seg_key[64];
-    snprintf(seg_key, sizeof(seg_key), "%lld_%lld",
-             (long long)current->from_id, (long long)current->to_id);
+    /* reached destination? */
+    if (reached_destination(current, to_street)) {
+      /* append dest only if not already the exact same segment */
+      if (!(current->from_id == to_street->from_id &&
+            current->to_id   == to_street->to_id))
+        add_street_to_list(&path, *to_street);
+      free_visited(visited);
+      free_queue(&q);
+      return path;
+    }
 
-    if (!is_visited(visited, seg_key)) {
-      mark_visited(&visited, seg_key);
+    if (!is_visited(visited, current->from_id, current->to_id)) {
+      mark_visited(&visited, current->from_id, current->to_id);
 
-      /* ── CHANGED: get_connected now uses hash map ── */
-      t_streets *connected = get_connected(map, current);
+      t_streets *connected = get_connected(current, all_streets);
       t_streets *conn_cur  = connected;
       while (conn_cur) {
-        char conn_key[64];
-        snprintf(conn_key, sizeof(conn_key), "%lld_%lld",
-                 (long long)conn_cur->street.from_id,
-                 (long long)conn_cur->street.to_id);
-        if (!is_visited(visited, conn_key)) {
+        if (!is_visited(visited, conn_cur->street.from_id, conn_cur->street.to_id)) {
           t_streets *new_path = copy_path(path);
           add_street_to_list(&new_path, conn_cur->street);
           enqueue(&q, new_path);
@@ -216,8 +162,8 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
   free_visited(visited);
   return NULL;
 }
-/* ── Print step-by-step directions with distance ────────────────────── */
 
+/* ── Print step-by-step directions ─────────────────────────────────── */
 void print_path(t_streets *path) {
   if (!path) {
     printf(S_RED "No path found.\n" RESET);
@@ -226,22 +172,19 @@ void print_path(t_streets *path) {
 
   printf(S_GREEN "\n\t--- Step-by-step directions ---\n" RESET);
 
-  t_streets *cur      = path;
+  t_streets *cur       = path;
   char       prev[100] = "";
-  int        step     = 1;
-  double     seg_dist = 0.0;
+  int        step      = 1;
+  double     seg_dist  = 0.0;
 
   while (cur) {
     int name_changed = strcmp(cur->street.st_name, prev) != 0;
 
-    /* if street name changes, print the accumulated previous street */
     if (name_changed && prev[0] != '\0') {
-      printf(S_CYAN "\t%d. %s  (%.0f m)\n" RESET,
-             step++, prev, seg_dist * 1000.0);
+      printf(S_CYAN "\t%d. %s  (%.0f m)\n" RESET, step++, prev, seg_dist * 1000.0);
       seg_dist = 0.0;
     }
 
-    /* accumulate distance for this segment */
     Position from = {cur->street.from_lat, cur->street.from_lon};
     Position to   = {cur->street.to_lat,   cur->street.to_lon};
     seg_dist += haversine(from, to);
@@ -252,7 +195,6 @@ void print_path(t_streets *path) {
     cur = cur->next;
   }
 
-  /* print last street */
   if (prev[0] != '\0')
     printf(S_CYAN "\t%d. %s  (%.0f m)\n" RESET, step, prev, seg_dist * 1000.0);
 

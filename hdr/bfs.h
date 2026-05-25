@@ -17,7 +17,8 @@ typedef struct {
 } t_queue;
 
 typedef struct s_visited {
-  char            st_name[100];
+  long long        from_id;
+  long long        to_id;
   struct s_visited *next;
 } t_visited;
 
