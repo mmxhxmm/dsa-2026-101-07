@@ -90,10 +90,10 @@ int init_streets_hash(t_hash_map **street_hash_map, t_streets *street_list) {
   t_streets *curr = street_list;
   while (curr != NULL) {
     insert_intersection(map, curr->street.from_id, &(curr->street));
+    insert_intersection(map, curr->street.to_id,   &(curr->street)); 
     curr = curr->next;
   }
   *street_hash_map = map;
-
   return EXIT_SUCCESS;
 }
 
