@@ -95,7 +95,10 @@ static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
     if (node->intersection_id == current_street->to_id) {
       t_connected_street *c = node->connections;
       while (c) {
-        if (c->street->from_id == current_street->to_id)
+        /* STRICT: only streets that START at current->to_id
+           and are NOT the reverse of current segment */
+        if (c->street->from_id == current_street->to_id &&
+            c->street->to_id   != current_street->from_id)
           add_street_to_list(&connected, *c->street);
         c = c->next;
       }
