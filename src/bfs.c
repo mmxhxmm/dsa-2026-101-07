@@ -88,18 +88,16 @@ static t_streets *path_last(t_streets *path) {
 static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
   t_streets *connected = NULL;
 
-  int index = hash_function(current_street->to_id, map->size);
-  t_hash_node *node = map->buckets[index];
+  int idx = hash_function(current_street->to_id, map->size);
+  t_hash_node *node = map->buckets[idx];
 
   while (node) {
     if (node->intersection_id == current_street->to_id) {
-      t_connected_street *conn = node->connections;
-      while (conn) {
-        /* Skip the reverse of current segment to avoid going backwards */
-        if (!(conn->street->from_id == current_street->to_id &&
-              conn->street->to_id   == current_street->from_id))
-          add_street_to_list(&connected, *conn->street);
-        conn = conn->next;
+      t_connected_street *c = node->connections;
+      while (c) {
+        if (c->street->from_id == current_street->to_id)
+          add_street_to_list(&connected, *c->street);
+        c = c->next;
       }
       break;
     }
@@ -133,7 +131,7 @@ static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
 
 t_streets *bfs(t_hash_map *map, t_street *from_street,
                t_street *to_street, t_streets *all_streets) {
-  (void)all_streets; // no longer needed
+  (void)all_streets; // no longer needed, using hash map
   if (!from_street || !to_street || !map) return NULL;
 
   t_queue    q       = {NULL, NULL};
@@ -151,24 +149,20 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
     t_streets *last    = path_last(path);
     t_street  *current = &last->street;
 
-    /* Exact segment match */
-    if (current->from_id == to_street->from_id &&
-        current->to_id   == to_street->to_id) {
-      free_visited(visited);
-      free_queue(&q);
-      return path;
-    }
-
-    /* Arrived at an intersection touching the destination */
+    /* ── CHANGED: termination condition ── */
     if (current->to_id == to_street->from_id ||
-        current->to_id == to_street->to_id) {
-      add_street_to_list(&path, *to_street);
+        current->to_id == to_street->to_id   ||
+        (current->from_id == to_street->from_id &&
+         current->to_id   == to_street->to_id)) {
+      if (current->from_id != to_street->from_id ||
+          current->to_id   != to_street->to_id)
+        add_street_to_list(&path, *to_street);
       free_visited(visited);
       free_queue(&q);
       return path;
     }
 
-    /* Visited by segment key */
+    /* ── CHANGED: visited tracked by segment ID, not name ── */
     char seg_key[64];
     snprintf(seg_key, sizeof(seg_key), "%lld_%lld",
              (long long)current->from_id, (long long)current->to_id);
@@ -176,7 +170,8 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
     if (!is_visited(visited, seg_key)) {
       mark_visited(&visited, seg_key);
 
-      t_streets *connected = get_connected(map, current); // ← uses map now
+      /* ── CHANGED: get_connected now uses hash map ── */
+      t_streets *connected = get_connected(map, current);
       t_streets *conn_cur  = connected;
       while (conn_cur) {
         char conn_key[64];
