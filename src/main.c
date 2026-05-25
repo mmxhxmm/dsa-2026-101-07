@@ -54,55 +54,53 @@ int main() {
     t_streets *start = closest_street(streets, op);
     t_streets *end   = closest_street(streets, dp);
 
-    /* ── DEBUG START ── */
-    printf("[DEBUG] origin: '%s' from=%lld to=%lld\n",
-        start->street.st_name,
-        (long long)start->street.from_id,
-        (long long)start->street.to_id);
-    printf("[DEBUG] dest:   '%s' from=%lld to=%lld\n",
-        end->street.st_name,
-        (long long)end->street.from_id,
-        (long long)end->street.to_id);
-
-    long long lookup = start->street.to_id;
-    int idx = hash_function(lookup, map->size);
-    t_hash_node *node = map->buckets[idx];
-    printf("[DEBUG] Neighbors at origin->to_id=%lld bucket=%d:\n", lookup, idx);
-    while (node) {
-      if (node->intersection_id == lookup) {
-        t_connected_street *c = node->connections;
-        while (c) {
-          printf("[DEBUG]   '%s' from=%lld to=%lld\n",
-              c->street->st_name,
-              (long long)c->street->from_id,
-              (long long)c->street->to_id);
-          c = c->next;
-        }
-        break;
-      }
-      node = node->next;
-    }
-
-    int reachable = 0;
-    t_streets *s = streets;
-    while (s) {
-      if (s->street.to_id == end->street.from_id ||
-          s->street.to_id == end->street.to_id) {
-        printf("[DEBUG] street reaching dest: '%s' from=%lld to=%lld\n",
-            s->street.st_name,
-            (long long)s->street.from_id,
-            (long long)s->street.to_id);
-        reachable = 1;
-        break;
-      }
-      s = s->next;
-    }
-    if (!reachable)
-      printf("[DEBUG] FATAL: no street leads to destination!\n");
-    /* ── DEBUG END ── */
-
     printf(S_GREEN "Finding route...\n" RESET);
+
     t_streets *path = bfs(map, &start->street, &end->street, streets);
+
+    /* If no path, flip origin direction and retry */
+    if (!path) {
+      t_street flipped = start->street;
+      long long tmp    = flipped.from_id;
+      flipped.from_id  = flipped.to_id;
+      flipped.to_id    = tmp;
+      double tmp_lat   = flipped.from_lat;
+      double tmp_lon   = flipped.from_lon;
+      flipped.from_lat = flipped.to_lat;
+      flipped.from_lon = flipped.to_lon;
+      flipped.to_lat   = tmp_lat;
+      flipped.to_lon   = tmp_lon;
+      path = bfs(map, &flipped, &end->street, streets);
+    }
+
+    /* If still no path, flip destination direction and retry both */
+    if (!path) {
+      t_street flipped_end = end->street;
+      long long tmp        = flipped_end.from_id;
+      flipped_end.from_id  = flipped_end.to_id;
+      flipped_end.to_id    = tmp;
+      double tmp_lat       = flipped_end.from_lat;
+      double tmp_lon       = flipped_end.from_lon;
+      flipped_end.from_lat = flipped_end.to_lat;
+      flipped_end.from_lon = flipped_end.to_lon;
+      flipped_end.to_lat   = tmp_lat;
+      flipped_end.to_lon   = tmp_lon;
+      path = bfs(map, &start->street, &flipped_end, streets);
+      if (!path) {
+        t_street flipped_start = start->street;
+        tmp                    = flipped_start.from_id;
+        flipped_start.from_id  = flipped_start.to_id;
+        flipped_start.to_id    = tmp;
+        tmp_lat                = flipped_start.from_lat;
+        tmp_lon                = flipped_start.from_lon;
+        flipped_start.from_lat = flipped_start.to_lat;
+        flipped_start.from_lon = flipped_start.to_lon;
+        flipped_start.to_lat   = tmp_lat;
+        flipped_start.to_lon   = tmp_lon;
+        path = bfs(map, &flipped_start, &flipped_end, streets);
+      }
+    }
+
     print_path(path);
     if (path) free_streets(path);
   }
