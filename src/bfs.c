@@ -88,15 +88,13 @@ static t_streets *path_last(t_streets *path) {
 static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
   t_streets *connected = NULL;
 
+  /* Try forward: streets starting where current ends */
   int idx = hash_function(current_street->to_id, map->size);
   t_hash_node *node = map->buckets[idx];
-
   while (node) {
     if (node->intersection_id == current_street->to_id) {
       t_connected_street *c = node->connections;
       while (c) {
-        /* STRICT: only streets that START at current->to_id
-           and are NOT the reverse of current segment */
         if (c->street->from_id == current_street->to_id &&
             c->street->to_id   != current_street->from_id)
           add_street_to_list(&connected, *c->street);
@@ -106,8 +104,30 @@ static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
     }
     node = node->next;
   }
+
+  /* If dead end: also try streets starting from current->from_id
+     (treats current intersection as reachable from both ends) */
+  if (!connected) {
+    idx = hash_function(current_street->from_id, map->size);
+    node = map->buckets[idx];
+    while (node) {
+      if (node->intersection_id == current_street->from_id) {
+        t_connected_street *c = node->connections;
+        while (c) {
+          if (c->street->from_id == current_street->from_id &&
+              c->street->to_id   != current_street->to_id)
+            add_street_to_list(&connected, *c->street);
+          c = c->next;
+        }
+        break;
+      }
+      node = node->next;
+    }
+  }
+
   return connected;
 }
+
 /* ── BFS — follows the pseudocode exactly ───────────────────────────── */
 /*
  * BFS(intersections_graph, fromStreet, toStreet):
@@ -152,19 +172,19 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
     t_streets *last    = path_last(path);
     t_street  *current = &last->street;
 
-    /* ── CHANGED: termination condition ── */
-    if (current->to_id == to_street->from_id ||
-        current->to_id == to_street->to_id   ||
-        (current->from_id == to_street->from_id &&
-         current->to_id   == to_street->to_id)) {
-      if (current->from_id != to_street->from_id ||
-          current->to_id   != to_street->to_id)
-        add_street_to_list(&path, *to_street);
-      free_visited(visited);
-      free_queue(&q);
-      return path;
-    }
-
+   if (current->to_id   == to_street->from_id ||
+    current->to_id   == to_street->to_id   ||
+    current->from_id == to_street->from_id ||
+    current->from_id == to_street->to_id   ||
+    (current->from_id == to_street->from_id &&
+     current->to_id   == to_street->to_id)) {
+  if (!(current->from_id == to_street->from_id &&
+        current->to_id   == to_street->to_id))
+    add_street_to_list(&path, *to_street);
+  free_visited(visited);
+  free_queue(&q);
+  return path;
+}
     /* ── CHANGED: visited tracked by segment ID, not name ── */
     char seg_key[64];
     snprintf(seg_key, sizeof(seg_key), "%lld_%lld",
