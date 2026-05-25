@@ -130,6 +130,7 @@ static t_streets *get_connected(t_hash_map *map, t_street *current_street) {
  *
  *   return NULL
  */
+
 t_streets *bfs(t_hash_map *map, t_street *from_street,
                t_street *to_street, t_streets *all_streets) {
   (void)all_streets; // no longer needed

@@ -44,21 +44,69 @@ int main() {
         handle_destination(destination_coordinates, houses, places, streets, map);
       break;
     case 3:
-      if (origin_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
-      else if (destination_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
-      else {
-        Position op = {origin_coordinates[0],      origin_coordinates[1]};
-        Position dp = {destination_coordinates[0], destination_coordinates[1]};
-        t_streets *start = closest_street(streets, op);
-        t_streets *end   = closest_street(streets, dp);
-        printf(S_GREEN "Finding route...\n" RESET);
-        t_streets *path = bfs(map, &start->street, &end->street, streets);
-        print_path(path);
-        if (path) free_streets(path);
+  if (origin_coordinates[0] == -1)
+    printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
+  else if (destination_coordinates[0] == -1)
+    printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
+  else {
+    Position op = {origin_coordinates[0], origin_coordinates[1]};
+    Position dp = {destination_coordinates[0], destination_coordinates[1]};
+    t_streets *start = closest_street(streets, op);
+    t_streets *end   = closest_street(streets, dp);
+
+    /* ── DEBUG START ── */
+    printf("[DEBUG] origin: '%s' from=%lld to=%lld\n",
+        start->street.st_name,
+        (long long)start->street.from_id,
+        (long long)start->street.to_id);
+    printf("[DEBUG] dest:   '%s' from=%lld to=%lld\n",
+        end->street.st_name,
+        (long long)end->street.from_id,
+        (long long)end->street.to_id);
+
+    long long lookup = start->street.to_id;
+    int idx = hash_function(lookup, map->size);
+    t_hash_node *node = map->buckets[idx];
+    printf("[DEBUG] Neighbors at origin->to_id=%lld bucket=%d:\n", lookup, idx);
+    while (node) {
+      if (node->intersection_id == lookup) {
+        t_connected_street *c = node->connections;
+        while (c) {
+          printf("[DEBUG]   '%s' from=%lld to=%lld\n",
+              c->street->st_name,
+              (long long)c->street->from_id,
+              (long long)c->street->to_id);
+          c = c->next;
+        }
+        break;
       }
-      break;
+      node = node->next;
+    }
+
+    int reachable = 0;
+    t_streets *s = streets;
+    while (s) {
+      if (s->street.to_id == end->street.from_id ||
+          s->street.to_id == end->street.to_id) {
+        printf("[DEBUG] street reaching dest: '%s' from=%lld to=%lld\n",
+            s->street.st_name,
+            (long long)s->street.from_id,
+            (long long)s->street.to_id);
+        reachable = 1;
+        break;
+      }
+      s = s->next;
+    }
+    if (!reachable)
+      printf("[DEBUG] FATAL: no street leads to destination!\n");
+    /* ── DEBUG END ── */
+
+    printf(S_GREEN "Finding route...\n" RESET);
+    t_streets *path = bfs(map, &start->street, &end->street, streets);
+    print_path(path);
+    if (path) free_streets(path);
+  }
+  break;
     case 4:
       exit = true;
       break;
