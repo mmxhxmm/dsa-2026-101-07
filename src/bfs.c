@@ -124,43 +124,57 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
   (void)map;
   if (!from_street || !to_street || !all_streets) return NULL;
 
-  t_queue   q       = {NULL, NULL};
+  t_queue    q       = {NULL, NULL};
   t_visited *visited = NULL;
 
-  /* create [fromStreet] and enqueue */
   t_streets *initial_path = NULL;
   add_street_to_list(&initial_path, *from_street);
   enqueue(&q, initial_path);
 
   while (q.head) {
-    t_queue_item *item    = dequeue(&q);
-    t_streets    *path    = item->path;
+    t_queue_item *item = dequeue(&q);
+    t_streets    *path = item->path;
     free(item);
 
-    t_streets *last       = path_last(path);
-    t_street  *current    = &last->street;
+    t_streets *last    = path_last(path);
+    t_street  *current = &last->street;
 
-    /* if current_street == toStreet: return path
-     * Match if any intersection ID overlaps with destination street */
-    if (current->from_id == to_street->from_id ||
-        current->from_id == to_street->to_id   ||
-        current->to_id   == to_street->from_id ||
-        current->to_id   == to_street->to_id   ||
-        strcmp(current->st_name, to_street->st_name) == 0) {
+    /* ── Termination: reached destination street ── */
+    if (strcmp(current->st_name, to_street->st_name) == 0 &&
+        current->from_id == to_street->from_id &&
+        current->to_id   == to_street->to_id) {
       free_visited(visited);
       free_queue(&q);
       return path;
     }
 
-    /* if current_street not in visited */
-    if (!is_visited(visited, current->st_name)) {
-      mark_visited(&visited, current->st_name);
+    /* ── Also accept if we share a to_id with destination's from_id ── */
+    /* (i.e. we arrived at the intersection the destination starts from) */
+    if (current->to_id == to_street->from_id ||
+        current->to_id == to_street->to_id) {
+      /* append destination street and return */
+      add_street_to_list(&path, *to_street);
+      free_visited(visited);
+      free_queue(&q);
+      return path;
+    }
 
-      /* for connected_street in graph[current_street.to_intersection] */
+    /* ── Visited check by segment ID to avoid skipping same-name streets ── */
+    char seg_key[64];
+    snprintf(seg_key, sizeof(seg_key), "%lld_%lld",
+             (long long)current->from_id, (long long)current->to_id);
+
+    if (!is_visited(visited, seg_key)) {
+      mark_visited(&visited, seg_key);
+
       t_streets *connected = get_connected(current, all_streets);
       t_streets *conn_cur  = connected;
       while (conn_cur) {
-        if (!is_visited(visited, conn_cur->street.st_name)) {
+        char conn_key[64];
+        snprintf(conn_key, sizeof(conn_key), "%lld_%lld",
+                 (long long)conn_cur->street.from_id,
+                 (long long)conn_cur->street.to_id);
+        if (!is_visited(visited, conn_key)) {
           t_streets *new_path = copy_path(path);
           add_street_to_list(&new_path, conn_cur->street);
           enqueue(&q, new_path);
@@ -176,7 +190,6 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
   free_visited(visited);
   return NULL;
 }
-
 /* ── Print step-by-step directions with distance ────────────────────── */
 
 void print_path(t_streets *path) {
