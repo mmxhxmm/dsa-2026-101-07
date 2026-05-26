@@ -26,4 +26,6 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
                t_street *to_street, t_streets *all_streets);
 void       print_path(t_streets *path);
 
+void turn_r_l(t_streets *cur, char* direction);
+
 #endif

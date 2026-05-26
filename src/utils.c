@@ -157,3 +157,16 @@ double haversine(Position posA, Position posB) {
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
   return EARTH_RADIUS * c;
 }
+
+
+//Transforms lat and lon into xy coordinates
+
+void latlon_to_xy(double lat_ref, double lon_ref,
+                  double lat, double lon,
+                  double *x, double *y) {
+    double lat_ref_rad = toRadians(lat_ref);
+    double dlat = toRadians(lat - lat_ref);
+    double dlon = toRadians(lon - lon_ref);
+    *x = EARTH_RADIUS * dlon * cos(lat_ref_rad);
+    *y = EARTH_RADIUS * dlat;
+}

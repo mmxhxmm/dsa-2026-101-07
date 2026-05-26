@@ -17,5 +17,8 @@ double toDegrees(double radians);
 double toRadians(double degree);
 Position midpoint(Position a, Position b);
 double haversine(Position posA, Position posB);
+void latlon_to_xy(double lat_ref, double lon_ref,
+                  double lat, double lon,
+                  double *x, double *y);
 
 #endif
