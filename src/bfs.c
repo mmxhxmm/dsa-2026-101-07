@@ -223,13 +223,12 @@ void print_path(t_streets *path) {
   char   prev[100] = "";
   int    step      = 1;
   double seg_dist  = 0.0;
-  char   direction[30];
+  char   direction[30] = "";
 
   while (cur) {
-    /* accumulate distance FIRST */
     Position from = {cur->street.from_lat, cur->street.from_lon};
     Position to   = {cur->street.to_lat,   cur->street.to_lon};
-    seg_dist += haversine(from, to);
+    double current_dist = haversine(from, to);
 
     int name_changed = strcmp(cur->street.st_name, prev) != 0;
 
@@ -237,7 +236,10 @@ void print_path(t_streets *path) {
       turn_r_l(previous_segment, direction);
       printf(S_CYAN "\t%d. %s%s  (%.0f m)\n" RESET,
              step++, direction, prev, seg_dist * 1000.0);
-      seg_dist = 0.0;
+      /* start fresh: current segment belongs to the new street */
+      seg_dist = current_dist;
+    } else {
+      seg_dist += current_dist;
     }
 
     if (name_changed)
