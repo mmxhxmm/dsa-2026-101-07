@@ -69,21 +69,18 @@ Since V ≈ N, this simplifies to **O(N²)** in practice. A hash-map-based neigh
 
 ### Plot
 
-```
-Normal Search Latency vs Hash Map Latency (log scale)
-
-Latency (ns)
-100,000,000 |                                              *  xl_1
- 10,000,000 |                               *  lg_1
-  1,000,000 |                  *  md_1
-    100,000 |    *  xs_1
-     10,000 | ●    ●    ●    ●    ●   ← Hash map (flat ~10-14K ns)
-      1,000 |
-            +----+----+----+----+----+
-           xs_1 xs_2 md_1 lg_1 xl_1
-
-  * = Normal (sequential)    ● = Hash map
-```
+<picture>
+  <source 
+    media="(prefers-color-scheme: dark)" 
+    srcset="./images/plot1_connected_streets.png">
+  <source 
+    media="(prefers-color-scheme: light)"
+    srcset="./problem_images/example_map_street_numbers.svg">
+  <img 
+    alt="plot connected streets" 
+    srcset="./problem_images/plot1_connected_streets.png"
+    style="display: block; margin: 0 auto; max-width: 600px; height: auto;">
+</picture>
 
 ### Explanation
 
@@ -109,21 +106,18 @@ Since the final implementation uses a sequential scan inside `get_connected` (th
 
 ### Plot
 
-```
-BFS Latency vs Map Size (far paths, log scale)
-
-Latency (ns)
-10,000,000,000 |                                         *  xl_1
- 1,000,000,000 |
-   100,000,000 |                  *  md_1    *  lg_1
-    10,000,000 |
-     1,000,000 |
-       100,000 |                  *  xs_2
-        10,000 | *  xs_1
-         1,000 |
-               +-------+-------+-------+-------+-------+
-              xs_1    xs_2    md_1    lg_1    xl_1
-```
+<picture>
+  <source 
+    media="(prefers-color-scheme: dark)" 
+    srcset="./images/plot2_bfs_close_vs_far.png">
+  <source 
+    media="(prefers-color-scheme: light)"
+    srcset="./problem_images/example_map_street_numbers.svg">
+  <img 
+    alt="plot BFS close and far" 
+    srcset="./problem_images/plot2_bfs_close_vs_far.png"
+    style="display: block; margin: 0 auto; max-width: 600px; height: auto;">
+</picture>
 
 ### Explanation
 
@@ -147,23 +141,18 @@ A hash-map-based neighbor lookup would reduce each `get_connected` call from O(N
 
 ### Plot
 
-```
-BFS Close vs Far Latency (log scale)
-
-Latency (ns)
-10,000,000,000 |                                              F  xl_1
- 1,000,000,000 |
-   100,000,000 |                  F  md_1       F  lg_1
-    10,000,000 |
-     1,000,000 |                               C  lg_1
-       100,000 |    F  xs_1   F  xs_2
-        10,000 |                  C  md_1
-         1,000 | C  xs_1   C  xs_2              C  xl_1
-               +-------+-------+-------+-------+-------+
-              xs_1    xs_2    md_1    lg_1    xl_1
-
-  C = Close path    F = Far path
-```
+<picture>
+  <source 
+    media="(prefers-color-scheme: dark)" 
+    srcset="./images/plot3_bfs_sequential_vs_hashmap.png">
+  <source 
+    media="(prefers-color-scheme: light)"
+    srcset="./problem_images/plot3_bfs_sequential_vs_hashmap.png">
+  <img 
+    alt="plot BFS close and far" 
+    srcset="./problem_images/plot2_bfs_close_vs_far.png"
+    style="display: block; margin: 0 auto; max-width: 600px; height: auto;">
+</picture>
 
 ### Explanation
 
