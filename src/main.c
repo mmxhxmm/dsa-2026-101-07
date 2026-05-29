@@ -31,57 +31,51 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  while (!exit) {
+  while (!exit)
+  {
     option = action_menu();
-    switch (option) {
-    case 1:
-      handle_origin(origin_coordinates, houses, places, streets, map);
-      break;
-    case 2:
-      if (origin_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
-      else
-        handle_destination(destination_coordinates, houses, places, streets,
-                           map);
-      break;
-    case 3:
-      if (origin_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
-      else if (destination_coordinates[0] == -1)
-        printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
-      else {
-        #include <time.h>  // at top of main.c
+    
+    switch (option)
+    {
+      case 1:
+        handle_origin(origin_coordinates, houses, places, streets, map);
+        break;
 
-// inside case 3, wrap the bfs call:
-        Position op = {origin_coordinates[0], origin_coordinates[1]};
-        Position dp = {destination_coordinates[0], destination_coordinates[1]};
-        if (op.lat == dp.lat && op.lon == op.lon) {
-          printf(S_YELLOW"\tYou're already al your destiny\n");
-          break ;
+      case 2:
+        if (origin_coordinates[0] == -1)
+          printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
+        else
+          handle_destination(destination_coordinates, houses, places, streets,
+                            map);
+        break;
+
+      case 3:
+        if (origin_coordinates[0] == -1)
+          printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
+        else if (destination_coordinates[0] == -1)
+          printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
+        else {
+          Position op = {origin_coordinates[0], origin_coordinates[1]};
+          Position dp = {destination_coordinates[0], destination_coordinates[1]};
+          if (op.lat == dp.lat && op.lon == op.lon) {
+            printf(S_YELLOW"\tYou're already al your destiny\n");
+            break ;
+          }
+          t_streets *start = closest_street(streets, op);
+          t_streets *end = closest_street(streets, dp);
+          printf(S_GREEN "Finding route...\n" RESET);
+          t_streets *path = bfs(map, &start->street, &end->street, streets);
+          print_path(path);
+          if (path)
+            free_streets(path);
         }
-        t_streets *start = closest_street(streets, op);
-        t_streets *end = closest_street(streets, dp);
-        printf(S_GREEN "Finding route...\n" RESET);
-        
-        struct timespec t1, t2;
-        clock_gettime(CLOCK_MONOTONIC, &t1);
-        t_streets *path = bfs(map, &start->street, &end->street, streets);
-        clock_gettime(CLOCK_MONOTONIC, &t2);
-        long bfs_ns = (t2.tv_sec - t1.tv_sec) * 1000000000L + (t2.tv_nsec - t1.tv_nsec);
-        printf("[BENCH] BFS: %ld ns\n", bfs_ns);
-        
-        //t_streets *path = bfs(map, &start->street, &end->street, streets);
-        print_path(path);
-        if (path)
-          free_streets(path);
-      }
-      break;
-    case 4:
-      exit = true;
-      break;
-    default:
-      printf("Invalid option\n");
-      break;
+        break;
+      case 4:
+        exit = true;
+        break;
+      default:
+        printf("Invalid option\n");
+        break;
     }
   }
 
