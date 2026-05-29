@@ -118,31 +118,17 @@ void find_connected_streets_segment(t_streets *closest_str, t_streets *head,
 
     if ((current_data.from_id == closest_str->street.to_id) ||
         (current_data.to_id == closest_str->street.from_id)) {
-      int included = false;
       t_streets *current_for_included_nodes = *connected_streets_to_segment;
 
       while (current_for_included_nodes != NULL) {
         if (strcmp(current_for_included_nodes->street.st_name,
                    current_data.st_name) == 0)
-          included = true;
         current_for_included_nodes = current_for_included_nodes->next;
       }
-
-      if (included == false)
-        add_street_to_list(connected_streets_to_segment, current_data);
+      add_street_to_list(connected_streets_to_segment, current_data);
     }
 
     current = current->next;
   }
 }
 
-void find_connected_streets(t_streets *closest_str, t_streets *head,
-                            t_streets **connected_streets) {
-  t_streets *current = head;
-
-  while (current) {
-    if (strcmp(closest_str->street.st_name, current->street.st_name) == 0)
-      find_connected_streets_segment(current, head, connected_streets);
-    current = current->next;
-  }
-}
