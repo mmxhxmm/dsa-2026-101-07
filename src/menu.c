@@ -154,5 +154,6 @@ void handle_destination(double coords[2], t_houses *houses, t_places *places,
     printf(S_RED "\tDestination not found\n" RESET);
     return;
   }
-  printf(S_GREEN "\tDestination set at (%.6f, %.6f)\n" RESET, coords[0], coords[1]);
+  printf(S_GREEN "\tDestination set at (%.6f, %.6f)\n" RESET, coords[0],
+         coords[1]);
 }

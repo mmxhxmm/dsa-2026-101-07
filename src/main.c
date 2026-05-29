@@ -12,12 +12,12 @@
 int main() {
   bool exit = false;
   int option;
-  t_houses   *houses  = NULL;
-  t_places   *places  = NULL;
-  t_streets  *streets = NULL;
-  t_hash_map *map     = NULL;
+  t_houses *houses = NULL;
+  t_places *places = NULL;
+  t_streets *streets = NULL;
+  t_hash_map *map = NULL;
 
-  double origin_coordinates[2]      = {-1, -1};
+  double origin_coordinates[2] = {-1, -1};
   double destination_coordinates[2] = {-1, -1};
 
   printf(S_PURPLE "\n\t--------- WELCOME to NPM-MAPS ------------\n" RESET);
@@ -41,24 +41,30 @@ int main() {
       if (origin_coordinates[0] == -1)
         printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
       else
-        handle_destination(destination_coordinates, houses, places, streets, map);
+        handle_destination(destination_coordinates, houses, places, streets,
+                           map);
       break;
     case 3:
-  if (origin_coordinates[0] == -1)
-    printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
-  else if (destination_coordinates[0] == -1)
-    printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
-  else {
-    Position op = {origin_coordinates[0], origin_coordinates[1]};
-    Position dp = {destination_coordinates[0], destination_coordinates[1]};
-    t_streets *start = closest_street(streets, op);
-    t_streets *end   = closest_street(streets, dp);
-    printf(S_GREEN "Finding route...\n" RESET);
-    t_streets *path = bfs(map, &start->street, &end->street, streets);
-    print_path(path);
-    if (path) free_streets(path);
-  }
-  break;
+      if (origin_coordinates[0] == -1)
+        printf(S_YELLOW "\t[WARNING]: Please enter origin first\n" RESET);
+      else if (destination_coordinates[0] == -1)
+        printf(S_YELLOW "\t[WARNING]: Please enter destination first\n" RESET);
+      else {
+        Position op = {origin_coordinates[0], origin_coordinates[1]};
+        Position dp = {destination_coordinates[0], destination_coordinates[1]};
+        if (op.lat == dp.lat && op.lon == op.lon) {
+          printf(S_YELLOW"\tYou're already al your destiny\n");
+          break ;
+        }
+        t_streets *start = closest_street(streets, op);
+        t_streets *end = closest_street(streets, dp);
+        printf(S_GREEN "Finding route...\n" RESET);
+        t_streets *path = bfs(map, &start->street, &end->street, streets);
+        print_path(path);
+        if (path)
+          free_streets(path);
+      }
+      break;
     case 4:
       exit = true;
       break;

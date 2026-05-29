@@ -143,8 +143,8 @@ Position midpoint(Position a, Position b) {
 }
 
 // Computes the distance between 2 positions
-
-double haversine(Position posA, Position posB) {
+double haversine(Position posA, Position posB)
+{
   double lat1 = toRadians(posA.lat);
   double lon1 = toRadians(posA.lon);
   double lat2 = toRadians(posB.lat);
@@ -158,15 +158,13 @@ double haversine(Position posA, Position posB) {
   return EARTH_RADIUS * c;
 }
 
+// Transforms lat and lon into xy coordinates
 
-//Transforms lat and lon into xy coordinates
-
-void latlon_to_xy(double lat_ref, double lon_ref,
-                  double lat, double lon,
+void latlon_to_xy(double lat_ref, double lon_ref, double lat, double lon,
                   double *x, double *y) {
-    double lat_ref_rad = toRadians(lat_ref);
-    double dlat = toRadians(lat - lat_ref);
-    double dlon = toRadians(lon - lon_ref);
-    *x = EARTH_RADIUS * dlon * cos(lat_ref_rad);
-    *y = EARTH_RADIUS * dlat;
+  double lat_ref_rad = toRadians(lat_ref);
+  double dlat = toRadians(lat - lat_ref);
+  double dlon = toRadians(lon - lon_ref);
+  *x = EARTH_RADIUS * dlon * cos(lat_ref_rad);
+  *y = EARTH_RADIUS * dlat;
 }

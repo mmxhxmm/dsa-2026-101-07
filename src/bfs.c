@@ -1,7 +1,7 @@
 #include "../hdr/bfs.h"
 #include "../hdr/common.h"
-#include "../hdr/streets.h"
 #include "../hdr/init.h"
+#include "../hdr/streets.h"
 #include "../hdr/utils.h"
 
 /* ── Visited helpers ────────────────────────────────────────────────── */
@@ -15,13 +15,15 @@ static int is_visited(t_visited *visited, long long from_id, long long to_id) {
   return 0;
 }
 
-static void mark_visited(t_visited **visited, long long from_id, long long to_id) {
+static void mark_visited(t_visited **visited, long long from_id,
+                         long long to_id) {
   t_visited *v = malloc(sizeof(t_visited));
-  if (!v) return;
+  if (!v)
+    return;
   v->from_id = from_id;
-  v->to_id   = to_id;
-  v->next    = *visited;
-  *visited   = v;
+  v->to_id = to_id;
+  v->next = *visited;
+  *visited = v;
 }
 
 static void free_visited(t_visited *visited) {
@@ -36,7 +38,7 @@ static void free_visited(t_visited *visited) {
 
 static t_streets *copy_path(t_streets *path) {
   t_streets *copy = NULL;
-  t_streets *cur  = path;
+  t_streets *cur = path;
   while (cur) {
     add_street_to_list(&copy, cur->street);
     cur = cur->next;
@@ -48,18 +50,25 @@ static t_streets *copy_path(t_streets *path) {
 
 static void enqueue(t_queue *q, t_streets *path) {
   t_queue_item *item = malloc(sizeof(t_queue_item));
-  if (!item) return;
+  if (!item)
+    return;
   item->path = path;
   item->next = NULL;
-  if (!q->tail) { q->head = q->tail = item; }
-  else          { q->tail->next = item; q->tail = item; }
+  if (!q->tail) {
+    q->head = q->tail = item;
+  } else {
+    q->tail->next = item;
+    q->tail = item;
+  }
 }
 
 static t_queue_item *dequeue(t_queue *q) {
-  if (!q->head) return NULL;
+  if (!q->head)
+    return NULL;
   t_queue_item *item = q->head;
   q->head = q->head->next;
-  if (!q->head) q->tail = NULL;
+  if (!q->head)
+    q->tail = NULL;
   item->next = NULL;
   return item;
 }
@@ -75,8 +84,10 @@ static void free_queue(t_queue *q) {
 /* ── Get last street in a path ──────────────────────────────────────── */
 
 static t_streets *path_last(t_streets *path) {
-  if (!path) return NULL;
-  while (path->next) path = path->next;
+  if (!path)
+    return NULL;
+  while (path->next)
+    path = path->next;
   return path;
 }
 
@@ -87,10 +98,10 @@ static t_streets *get_connected(t_street *current, t_streets *all_streets) {
   while (cur) {
     /* forward: next street starts where current ends */
     if (cur->street.from_id == current->to_id &&
-        cur->street.to_id   != current->from_id)
+        cur->street.to_id != current->from_id)
       add_street_to_list(&connected, cur->street);
     /* reverse: next street ends where current ends (bidirectional support) */
-    else if (cur->street.to_id   == current->to_id &&
+    else if (cur->street.to_id == current->to_id &&
              cur->street.from_id != current->from_id &&
              cur->street.from_id != current->to_id)
       add_street_to_list(&connected, cur->street);
@@ -102,65 +113,56 @@ static t_streets *get_connected(t_street *current, t_streets *all_streets) {
 /* ── Check if current street touches destination ────────────────────── */
 static int reached_destination(t_street *current, t_street *dest) {
   return (current->from_id == dest->from_id && current->to_id == dest->to_id) ||
-         (current->from_id == dest->to_id   && current->to_id == dest->from_id) ||
-         (current->to_id   == dest->from_id) ||
-         (current->to_id   == dest->to_id)   ||
+         (current->from_id == dest->to_id && current->to_id == dest->from_id) ||
+         (current->to_id == dest->from_id) || (current->to_id == dest->to_id) ||
          (current->from_id == dest->from_id) ||
          (current->from_id == dest->to_id);
 }
 
 /* ── Check whether the user have to turn right or left───────────────── */
+void turn_r_l(t_streets *cur, char *direction) {
 
-void turn_r_l(t_streets *cur, char* direction){
-
-  //If the next node is null, then it has already reached the last node of the path
-  if(cur->next==NULL){
-    return;
-  }
+  // If the next node is null, then it has already reached the last node of the
+  // path
+  if (cur->next == NULL)
+    return ;
 
   double ax, ay;
   double bx, by;
   double cx, cy;
 
   Position from_position = {cur->street.from_lat, cur->street.from_lon};
-  Position intersect_position= {cur->street.to_lat, cur->street.to_lon};
+  Position intersect_position = {cur->street.to_lat, cur->street.to_lon};
   Position to_position = {cur->next->street.to_lat, cur->next->street.to_lon};
 
-  latlon_to_xy(from_position.lat, from_position.lon,
-              from_position.lat, from_position.lon,
-              &ax, &ay);
-  latlon_to_xy(from_position.lat, from_position.lon, 
-              intersect_position.lat, intersect_position.lon,
-              &bx, &by);
-  latlon_to_xy(from_position.lat, from_position.lon,
-              to_position.lat, to_position.lon,
-              &cx, &cy);
+  latlon_to_xy(from_position.lat, from_position.lon, from_position.lat,
+               from_position.lon, &ax, &ay);
+  latlon_to_xy(from_position.lat, from_position.lon, intersect_position.lat,
+               intersect_position.lon, &bx, &by);
+  latlon_to_xy(from_position.lat, from_position.lon, to_position.lat,
+               to_position.lon, &cx, &cy);
 
-  double cross_prod = (bx-ax)*(cy-by)-(by-ay)*(cx-bx);
+  double cross_prod = (bx - ax) * (cy - by) - (by - ay) * (cx - bx);
 
-  //To check if the turns coincide with the cross product values
-  printf("\ncross product: %lf ", cross_prod);
+  // printf("\ncross product: %lf ", cross_prod); // BORRAR
 
-  if(cross_prod>0){
+  if (cross_prod > 0) {
     strcpy(direction, "Turn left to ");
-  } 
-  else if(cross_prod==0){
+  } else if (cross_prod == 0) {
     strcpy(direction, "Keep moving forward to ");
-  }
-  else{
+  } else {
     strcpy(direction, "Turn right to ");
   }
-
 }
 
-
 /* ── BFS ────────────────────────────────────────────────────────────── */
-t_streets *bfs(t_hash_map *map, t_street *from_street,
-               t_street *to_street, t_streets *all_streets) {
+t_streets *bfs(t_hash_map *map, t_street *from_street, t_street *to_street,
+               t_streets *all_streets) {
   (void)map;
-  if (!from_street || !to_street || !all_streets) return NULL;
+  if (!from_street || !to_street || !all_streets)
+    return NULL;
 
-  t_queue    q       = {NULL, NULL};
+  t_queue q = {NULL, NULL};
   t_visited *visited = NULL;
 
   t_streets *initial_path = NULL;
@@ -169,17 +171,17 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
 
   while (q.head) {
     t_queue_item *item = dequeue(&q);
-    t_streets    *path = item->path;
+    t_streets *path = item->path;
     free(item);
 
-    t_streets *last    = path_last(path);
-    t_street  *current = &last->street;
+    t_streets *last = path_last(path);
+    t_street *current = &last->street;
 
     /* reached destination? */
     if (reached_destination(current, to_street)) {
       /* append dest only if not already the exact same segment */
       if (!(current->from_id == to_street->from_id &&
-            current->to_id   == to_street->to_id))
+            current->to_id == to_street->to_id))
         add_street_to_list(&path, *to_street);
       free_visited(visited);
       free_queue(&q);
@@ -190,9 +192,10 @@ t_streets *bfs(t_hash_map *map, t_street *from_street,
       mark_visited(&visited, current->from_id, current->to_id);
 
       t_streets *connected = get_connected(current, all_streets);
-      t_streets *conn_cur  = connected;
+      t_streets *conn_cur = connected;
       while (conn_cur) {
-        if (!is_visited(visited, conn_cur->street.from_id, conn_cur->street.to_id)) {
+        if (!is_visited(visited, conn_cur->street.from_id,
+                        conn_cur->street.to_id)) {
           t_streets *new_path = copy_path(path);
           add_street_to_list(&new_path, conn_cur->street);
           enqueue(&q, new_path);

@@ -6,10 +6,9 @@
 #include "../hdr/streets.h"
 
 typedef struct s_queue_item {
-  t_streets          *path;  /* the street list representing this path */
+  t_streets *path; /* the street list representing this path */
   struct s_queue_item *next;
 } t_queue_item;
-
 
 typedef struct {
   t_queue_item *head;
@@ -17,15 +16,15 @@ typedef struct {
 } t_queue;
 
 typedef struct s_visited {
-  long long        from_id;
-  long long        to_id;
+  long long from_id;
+  long long to_id;
   struct s_visited *next;
 } t_visited;
 
-t_streets *bfs(t_hash_map *map, t_street *from_street,
-               t_street *to_street, t_streets *all_streets);
-void       print_path(t_streets *path);
+t_streets *bfs(t_hash_map *map, t_street *from_street, t_street *to_street,
+               t_streets *all_streets);
+void print_path(t_streets *path);
 
-void turn_r_l(t_streets *cur, char* direction);
+void turn_r_l(t_streets *cur, char *direction);
 
 #endif
