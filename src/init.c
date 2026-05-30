@@ -193,6 +193,18 @@ void free_hash_map(t_hash_map *map) {
   free(map);
 }
 
+
+void free_kd_tree(t_kd_nodes *root)
+{
+  if (!root)
+    return;
+
+  free_kd_tree(root->left);
+  free_kd_tree(root->right);
+
+  free(root);
+}
+
 /* D E L E T E */
 void print_houses(t_houses *node) {
   t_houses *tmp = node;

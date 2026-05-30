@@ -68,4 +68,15 @@ typedef struct position {
   double lon;
 } Position;
 
+typedef struct s_kd_node {
+  Position midpoint;
+  t_streets *street;
+} t_kd_node;
+
+typedef struct s_kd_nodes {
+  t_kd_node node;
+  struct s_kd_nodes *left;
+  struct s_kd_nodes *right;
+} t_kd_nodes;
+
 #endif

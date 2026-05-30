@@ -20,5 +20,6 @@ void free_houses(t_houses *list);
 void free_places(t_places *list);
 void free_streets(t_streets *list);
 void free_hash_map(t_hash_map *map);
+void free_kd_tree(t_kd_nodes *root);
 
 #endif
