@@ -111,6 +111,11 @@ void find_connected_streets_segment(t_streets *closest_str, t_streets *head,
     return;
   }
 
+  if (connected_streets_to_segment == NULL) {
+    printf("\nconnected_streets_to_segment is NULL");
+    return;
+  }
+
   t_streets *current = head;
 
   while (current) {
@@ -118,14 +123,22 @@ void find_connected_streets_segment(t_streets *closest_str, t_streets *head,
 
     if ((current_data.from_id == closest_str->street.to_id) ||
         (current_data.to_id == closest_str->street.from_id)) {
+      
+      int already_included = 0;
       t_streets *current_for_included_nodes = *connected_streets_to_segment;
 
       while (current_for_included_nodes != NULL) {
         if (strcmp(current_for_included_nodes->street.st_name,
-                   current_data.st_name) == 0)
+                   current_data.st_name) == 0){
+          already_included = 1;
+          break;
+        }
+
         current_for_included_nodes = current_for_included_nodes->next;
       }
-      add_street_to_list(connected_streets_to_segment, current_data);
+      if (!already_included) {
+        add_street_to_list(connected_streets_to_segment, current_data);
+      }
     }
 
     current = current->next;
