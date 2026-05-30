@@ -89,7 +89,7 @@ int init_streets_hash(t_hash_map **street_hash_map, t_streets *street_list) {
 
   t_streets *curr = street_list;
   while (curr != NULL) {
-    //insert_intersection(map, curr->street.from_id, &(curr->street));
+    // insert_intersection(map, curr->street.from_id, &(curr->street));
     insert_intersection(map, curr->street.to_id, &(curr->street));
     curr = curr->next;
   }
@@ -193,9 +193,7 @@ void free_hash_map(t_hash_map *map) {
   free(map);
 }
 
-
-void free_kd_tree(t_kd_nodes *root)
-{
+void free_kd_tree(t_kd_nodes *root) {
   if (!root)
     return;
 

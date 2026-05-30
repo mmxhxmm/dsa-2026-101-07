@@ -143,8 +143,7 @@ Position midpoint(Position a, Position b) {
 }
 
 // Computes the distance between 2 positions
-double haversine(Position posA, Position posB)
-{
+double haversine(Position posA, Position posB) {
   double lat1 = toRadians(posA.lat);
   double lon1 = toRadians(posA.lon);
   double lat2 = toRadians(posB.lat);

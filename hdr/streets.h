@@ -10,5 +10,4 @@ t_streets *closest_street(t_streets *list_streets, Position user_position);
 void find_connected_streets_segment(t_streets *closest_str, t_streets *head,
                                     t_streets **connected_streets_to_segment);
 
-
 #endif

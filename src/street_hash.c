@@ -35,8 +35,7 @@ void print_connections_for_intersection(t_hash_map *map, long long inter_id,
   }
 }
 
-void find_connected_streets_map(t_hash_map *map, t_street *current_street)
-{
+void find_connected_streets_map(t_hash_map *map, t_street *current_street) {
   if (!map || !current_street)
     return;
 
@@ -46,10 +45,8 @@ void find_connected_streets_map(t_hash_map *map, t_street *current_street)
 
   int index = hash_function(current_street->to_id, map->size);
   t_hash_node *curr_node = map->buckets[index];
-  while (curr_node != NULL)
-  {
-    if (curr_node->intersection_id == current_street->to_id)
-    {
+  while (curr_node != NULL) {
+    if (curr_node->intersection_id == current_street->to_id) {
       t_connected_street *conn = curr_node->connections;
 
       while (conn != NULL) {
@@ -57,7 +54,7 @@ void find_connected_streets_map(t_hash_map *map, t_street *current_street)
         conn = conn->next;
       }
 
-      return ;
+      return;
     }
 
     curr_node = curr_node->next;
@@ -101,15 +98,14 @@ void insert_intersection(t_hash_map *map, long long inter_id,
 }
 
 /* B O R R A R */
-void print_hash_map(t_hash_map *map)
-{
-  if (!map)
-  {
+void print_hash_map(t_hash_map *map) {
+  if (!map) {
     printf("[PRINT HASH]: The map is NULL.\n");
-    return ;
+    return;
   }
 
-  printf("\n=================== INTERSECTION HASH MAP VISUALIZATION ===================\n");
+  printf("\n=================== INTERSECTION HASH MAP VISUALIZATION "
+         "===================\n");
 
   for (int i = 0; i < map->size; i++) {
     t_hash_node *curr_node = map->buckets[i];
@@ -117,8 +113,7 @@ void print_hash_map(t_hash_map *map)
     if (curr_node != NULL) {
       printf("Bucket [%d]:\n", i);
 
-      while (curr_node != NULL)
-      {
+      while (curr_node != NULL) {
         printf("  ├── Intersection ID: %lld\n", curr_node->intersection_id);
         printf("  │   Connected street segments:\n");
 
@@ -129,18 +124,19 @@ void print_hash_map(t_hash_map *map)
         while (conn != NULL) {
           printf("  │     └── [%lld -> %lld] %s\n", conn->street->from_id,
                  conn->street->to_id, conn->street->st_name);
-          conn = conn->next; 
+          conn = conn->next;
         }
 
-        curr_node =
-            curr_node->next;
+        curr_node = curr_node->next;
         if (curr_node != NULL)
           printf("  │\n");
       }
 
-      printf("===========================================================================\n");
+      printf("================================================================="
+             "==========\n");
     }
   }
 
-  printf("=========================== END OF HASH MAP ===========================\n\n");
+  printf("=========================== END OF HASH MAP "
+         "===========================\n\n");
 }

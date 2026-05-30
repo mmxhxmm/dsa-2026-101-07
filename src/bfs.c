@@ -125,7 +125,7 @@ void turn_r_l(t_streets *cur, char *direction) {
   // If the next node is null, then it has already reached the last node of the
   // path
   if (cur->next == NULL)
-    return ;
+    return;
 
   double ax, ay;
   double bx, by;
@@ -220,25 +220,25 @@ void print_path(t_streets *path) {
 
   printf(S_GREEN "\n\t--- Step-by-step directions ---\n" RESET);
 
-  t_streets *cur              = path;
+  t_streets *cur = path;
   t_streets *previous_segment = NULL;
 
-  char   prev[100] = "";
-  int    step      = 1;
-  double seg_dist  = 0.0;
-  char   direction[30] = "";
+  char prev[100] = "";
+  int step = 1;
+  double seg_dist = 0.0;
+  char direction[30] = "";
 
   while (cur) {
     Position from = {cur->street.from_lat, cur->street.from_lon};
-    Position to   = {cur->street.to_lat,   cur->street.to_lon};
+    Position to = {cur->street.to_lat, cur->street.to_lon};
     double current_dist = haversine(from, to);
 
     int name_changed = strcmp(cur->street.st_name, prev) != 0;
 
     if (name_changed && prev[0] != '\0') {
       turn_r_l(previous_segment, direction);
-      printf(S_CYAN "\t%d. %s%s  (%.0f m)\n" RESET,
-             step++, direction, prev, seg_dist * 1000.0);
+      printf(S_CYAN "\t%d. %s%s  (%.0f m)\n" RESET, step++, direction, prev,
+             seg_dist * 1000.0);
       /* start fresh: current segment belongs to the new street */
       seg_dist = current_dist;
     } else {
@@ -253,8 +253,8 @@ void print_path(t_streets *path) {
   }
 
   if (prev[0] != '\0')
-    printf(S_CYAN "\t%d. %s%s  (%.0f m)\n" RESET,
-           step, direction, prev, seg_dist * 1000.0);
+    printf(S_CYAN "\t%d. %s%s  (%.0f m)\n" RESET, step, direction, prev,
+           seg_dist * 1000.0);
 
   printf(S_GREEN "\t--- You have arrived ---\n" RESET);
 }
