@@ -73,7 +73,6 @@ t_kd_nodes *create_node_element(t_streets *street_ptr) {
   new_el->right = NULL;
   return new_el;
 }
-
 // At even depth, it checks lon, at odd depth, it checks lat, for sorting the
 // kd-binary tree
 t_kd_nodes *insert_kd_node(t_kd_nodes *root, t_kd_nodes *new_node, int depth) {
@@ -127,7 +126,8 @@ t_kd_nodes *create_kd_tree(t_streets *list) {
   return kd_tree_root;
 }
 
-int should_check_other_branch(t_kd_nodes *root, Position user_position, int depth, double closest_dist) {
+int should_check_other_branch(t_kd_nodes *root, Position user_position,
+                              int depth, double closest_dist) {
   Position split_point;
   double dist_to_split_line;
 
@@ -155,7 +155,9 @@ int should_check_other_branch(t_kd_nodes *root, Position user_position, int dept
   return 0;
 }
 
-void closest_street_kd_recursive(t_kd_nodes *root, Position user_position, int depth, t_streets **closest_street, double *closest_dist) {
+void closest_street_kd_recursive(t_kd_nodes *root, Position user_position,
+                                 int depth, t_streets **closest_street,
+                                 double *closest_dist) {
   double cur_dist;
   t_kd_nodes *near_branch;
   t_kd_nodes *far_branch;
@@ -194,14 +196,16 @@ void closest_street_kd_recursive(t_kd_nodes *root, Position user_position, int d
     First search the branch where the user position belongs.
     This is the branch most likely to contain the closest street.
   */
-  closest_street_kd_recursive(near_branch, user_position, depth + 1, closest_street, closest_dist);
+  closest_street_kd_recursive(near_branch, user_position, depth + 1,
+                              closest_street, closest_dist);
 
   /*
     Then only search the opposite branch if it could possibly
     contain a closer street.
   */
   if (should_check_other_branch(root, user_position, depth, *closest_dist)) {
-    closest_street_kd_recursive(far_branch, user_position, depth + 1, closest_street, closest_dist);
+    closest_street_kd_recursive(far_branch, user_position, depth + 1,
+                                closest_street, closest_dist);
   }
 }
 
@@ -209,12 +213,14 @@ t_streets *closest_street_kd(t_kd_nodes *kd_tree, Position user_position) {
   t_streets *closest_street = NULL;
   double closest_dist = -1;
 
-  closest_street_kd_recursive(kd_tree, user_position, 0, &closest_street, &closest_dist);
+  closest_street_kd_recursive(kd_tree, user_position, 0, &closest_street,
+                              &closest_dist);
 
   return closest_street;
 }
 
-void handle_origin(double coords[2], t_houses *houses, t_places *places, t_streets *streets, t_hash_map *street_map) {
+void handle_origin(double coords[2], t_houses *houses, t_places *places,
+                   t_streets *streets, t_hash_map *street_map) {
   struct timespec start, end;
 
   Position user_position;
