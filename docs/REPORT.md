@@ -198,7 +198,7 @@ and insert/lookup in a fixed-size open-addressing hash table.
 
 ## 8. Improvement to Finding the Closest Street Segment
 
-### Current implementation
+### First implementation
 
 `closest_street` iterates over the entire street list and computes the haversine distance to every segment, keeping the minimum:
 
@@ -206,7 +206,7 @@ and insert/lookup in a fixed-size open-addressing hash table.
 O(N)  per query
 ```
 
-### Proposed improvement: k-d Tree
+### Improved implementation: k-d Tree
 
 Index all street segment midpoints in a **2D k-d tree** keyed on `(latitude, longitude)`. A k-d tree supports nearest-neighbour queries in:
 
@@ -216,6 +216,7 @@ O(log N) average,  O(√N) worst case
 
 Construction costs O(N log N) once at initialization.
 
+### Alternative implementation: k-d Tree
 Alternatively, a **spatial grid** (divide the bounding box into fixed cells) allows O(1) average lookup by computing the cell index directly from coordinates, at the cost of a fixed memory allocation proportional to grid resolution.
 
 | Approach | Build cost | Query cost | Memory |
