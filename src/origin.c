@@ -25,7 +25,7 @@ void display_closest_street_info(t_streets *closest_ptr, t_streets *streets) {
          closest.to_lon);
 
   connected_streets = NULL;
-  find_connected_streets(closest_ptr, streets, &connected_streets);
+  find_connected_streets_segment(closest_ptr, streets, &connected_streets);
 
   printf("From this street segment, you can go to:\n");
   printf("- %s\n", closest.st_name);
