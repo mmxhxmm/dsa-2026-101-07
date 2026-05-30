@@ -211,10 +211,11 @@ O(N)  per query
 Index all street segment midpoints in a **2D k-d tree** keyed on `(latitude, longitude)`. A k-d tree supports nearest-neighbour queries in:
 
 ```
-O(log N) average,  O(√N) worst case
+O(log N) average,  O(N) worst case
 ```
 
-Construction costs O(N log N) once at initialization.
+Average construction costs O(N log N) once at initialization.
+Worst construction costs O(N²) once at initialization.
 
 ### Alternative implementation: k-d Tree
 Alternatively, a **spatial grid** (divide the bounding box into fixed cells) allows O(1) average lookup by computing the cell index directly from coordinates, at the cost of a fixed memory allocation proportional to grid resolution.
