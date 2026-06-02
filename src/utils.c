@@ -6,7 +6,7 @@
 #include "../hdr/street_hash.h"
 #include "../hdr/streets.h"
 
-/* create an identifier for our hash map array */
+/* create an identifie for our hash map array */
 int hash_function(long long intersection_id, int table_size) {
   return (int)(intersection_id % table_size);
 }

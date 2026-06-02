@@ -30,6 +30,7 @@ int main() {
     printf(S_RED "\t[ERROR]: initialitation failed!\n" RESET);
     return EXIT_FAILURE;
   }
+ print_hash_map(map);
 
   while (!exit) {
     option = action_menu();
