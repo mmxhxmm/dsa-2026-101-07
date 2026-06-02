@@ -236,7 +236,7 @@ void handle_origin(double coords[2], t_houses *houses, t_places *places,
   clock_gettime(CLOCK_MONOTONIC, &start);
   closest_ptr = closest_street(streets, user_position);
   clock_gettime(CLOCK_MONOTONIC, &end);
-  printf("\nLINEAR SEARCH of Closest street: %lld (ns)",
+  printf("LINEAR SEARCH of Closest street: %lld (ns)\n",
          (end.tv_sec - start.tv_sec) * 1000000000LL +
              (end.tv_nsec - start.tv_nsec));
 

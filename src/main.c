@@ -55,7 +55,7 @@ int main() {
       else {
         Position op = {origin_coordinates[0], origin_coordinates[1]};
         Position dp = {destination_coordinates[0], destination_coordinates[1]};
-        if (op.lat == dp.lat && op.lon == op.lon) {
+        if (op.lat == dp.lat && op.lon == dp.lon) {
           printf(S_YELLOW "\tYou're already al your destiny\n");
           break;
         }
